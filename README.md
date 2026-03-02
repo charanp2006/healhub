@@ -1,15 +1,15 @@
 # Healhub - Hospital Management & Healthcare Booking Platform
 
-## � Repository Links
+## 🔗 Repository Links
 
 [![Frontend](https://img.shields.io/badge/Frontend-Vercel-black?style=for-the-badge&logo=vercel)](https://github.com/charanp2006/healhub-frontend)
----
+
 [![Backend](https://img.shields.io/badge/Backend-Node.js-green?style=for-the-badge&logo=node.js)](https://github.com/charanp2006/healhub-backend)
----
+
 [![Admin](https://img.shields.io/badge/Admin-Vercel-black?style=for-the-badge&logo=vercel)](https://github.com/charanp2006/healhub-admin)
 
 
-## �📱 What is Healhub?
+## 🏥📱 What is Healhub?
 
 Healhub is a modern, all-in-one healthcare management platform designed to revolutionize how patients, doctors, and hospitals interact with each other. Think of it as the "Uber for healthcare" - a seamless digital bridge that connects patients looking for medical services with qualified doctors and well-equipped hospitals in their area.
 
