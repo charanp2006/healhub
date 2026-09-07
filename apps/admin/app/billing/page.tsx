@@ -4,9 +4,9 @@ import React, { useContext, useEffect, useState } from 'react';
 import { AdminContext } from '@/src/context/AdminContext';
 import { AppContext } from '@/src/context/AppContext';
 import axios from 'axios';
-import { toast } from 'react-toastify';
+import { toast } from "@/src/components/ui/Toast";
 import { Search, SlidersHorizontal, ChevronDown, ChevronLeft, ChevronRight, Receipt } from 'lucide-react';
-import { SkeletonCount } from "@healhub/ui";
+import { PageContainer, PageHeader, Card, Badge } from "@/src/components/ui";
 
 const BillingList = () => {
   const { aToken, backendURL } = useContext(AdminContext);
@@ -51,9 +51,9 @@ const BillingList = () => {
 
   const getStatusBadge = (status) => {
     switch (status) {
-      case 'paid': return <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-600"><span className="w-1.5 h-1.5 rounded-full bg-green-500" /> Paid</span>;
-      case 'pending': return <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-yellow-50 text-yellow-600"><span className="w-1.5 h-1.5 rounded-full bg-yellow-500" /> Pending</span>;
-      case 'overdue': return <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-red-50 text-red-500"><span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Overdue</span>;
+      case 'paid': return <Badge tone="emerald" dot>Paid</Badge>;
+      case 'pending': return <Badge tone="amber" dot>Pending</Badge>;
+      case 'overdue': return <Badge tone="rose" dot>Overdue</Badge>;
       default: return <span className="text-xs text-text-dim">{status}</span>;
     }
   };
@@ -70,16 +70,19 @@ const BillingList = () => {
   const hasActiveFilters = filterSearch || filterStatus || filterPaymentMethod || filterDateFrom || filterDateTo;
 
   return (
-    <div className="m-5 w-full max-w-6xl">
-      <div className="flex items-center justify-between mb-5">
-        <h1 className="text-lg font-medium">Billing & Invoices</h1>
-        <div className="flex items-center gap-3">
-          <button onClick={() => setShowFilters((v) => !v)} className={`flex items-center gap-2 text-sm border px-3 py-1.5 rounded-full cursor-pointer transition-colors ${hasActiveFilters ? "bg-primary text-white border-primary" : "text-text-secondary border-border hover:bg-primary-soft"}`}>
-            <SlidersHorizontal size={14} />{showFilters ? "Hide Filters" : "Filters"}{hasActiveFilters && <span className="w-4 h-4 rounded-full bg-background-card text-primary text-[10px] flex items-center justify-center font-bold">!</span>}
-          </button>
-          <button onClick={() => fetchBills(page)} className="flex items-center gap-2 text-sm border border-border px-3 py-1.5 rounded-full cursor-pointer hover:bg-primary-soft transition-colors">Refresh</button>
-        </div>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title="Billing & Invoices"
+        subtitle="Hospital commission bills and payment status"
+        actions={
+          <div className="flex items-center gap-2.5">
+            <button onClick={() => setShowFilters((v) => !v)} className={`flex items-center gap-2 text-sm border px-3.5 py-2 rounded-xl cursor-pointer transition-colors ${hasActiveFilters ? "bg-primary text-white border-primary" : "text-text-secondary border-border hover:bg-background-muted"}`}>
+              <SlidersHorizontal size={14} />{showFilters ? "Hide Filters" : "Filters"}{hasActiveFilters && <span className="w-4 h-4 rounded-full bg-background-card text-primary text-[10px] flex items-center justify-center font-bold">!</span>}
+            </button>
+            <button onClick={() => fetchBills(page)} className="flex items-center gap-2 text-sm border border-border px-3.5 py-2 rounded-xl cursor-pointer hover:bg-background-muted transition-colors">Refresh</button>
+          </div>
+        }
+      />
       {showFilters && (
         <form onSubmit={handleSearch} className="bg-background-card border border-border rounded-lg p-5 mb-6 flex flex-col gap-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -122,9 +125,9 @@ const BillingList = () => {
           </div>
         </form>
       )}
-      <p className="text-sm text-text-secondary mb-4">{loading ? <SkeletonCount /> : `${totalCount} bill${totalCount !== 1 ? "s" : ""} total`}</p>
-      <div className="bg-background-card border border-border rounded-lg overflow-hidden">
-        <div className="hidden sm:grid grid-cols-[1.5fr_2fr_1.5fr_1fr_1fr_1fr_auto] gap-2 py-3 px-6 border-b border-border text-sm font-medium text-text-secondary">
+      <p className="text-sm text-text-secondary mb-4">{loading ? "Loading bills..." : `${totalCount} bill${totalCount !== 1 ? "s" : ""} total`}</p>
+      <Card padded={false} className="overflow-hidden">
+        <div className="hidden sm:grid grid-cols-[1.5fr_2fr_1.5fr_1fr_1fr_1fr_auto] gap-2 py-3 px-6 border-b border-border text-[11px] font-semibold uppercase tracking-wide text-text-secondary">
           <p>Bill ID</p><p>Hospital</p><p>Amount</p><p>Status</p><p>Appointments</p><p>Date</p><p>Actions</p>
         </div>
         {bills.length === 0 ? (
@@ -146,7 +149,7 @@ const BillingList = () => {
             </div>
           ))
         )}
-      </div>
+      </Card>
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-4 mt-6">
           <button disabled={page <= 1} onClick={() => fetchBills(page - 1)} className="flex items-center gap-1 px-3 py-1.5 text-sm border border-border rounded-full disabled:opacity-40 cursor-pointer hover:bg-primary-soft transition-colors"><ChevronLeft size={14} /> Prev</button>
@@ -154,7 +157,7 @@ const BillingList = () => {
           <button disabled={page >= totalPages} onClick={() => fetchBills(page + 1)} className="flex items-center gap-1 px-3 py-1.5 text-sm border border-border rounded-full disabled:opacity-40 cursor-pointer hover:bg-primary-soft transition-colors">Next <ChevronRight size={14} /></button>
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 };
 

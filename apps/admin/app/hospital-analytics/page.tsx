@@ -7,6 +7,7 @@ import axios from 'axios';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { TrendingUp, TrendingDown, Building2, Users, CalendarCheck, DollarSign, Star, Award } from 'lucide-react';
 import { SkeletonDashboard } from "@healhub/ui";
+import { PageContainer, PageHeader } from "@/src/components/ui";
 
 const HospitalAnalytics = () => {
   const { aToken, backendURL, hospitals, getAllHospitals } = useContext(AdminContext);
@@ -66,16 +67,17 @@ const HospitalAnalytics = () => {
   const tabs = [{ key: 'overview', label: 'Overview' }, { key: 'revenue', label: 'Revenue' }, { key: 'doctors', label: 'Top Doctors' }];
 
   return (
-    <div className="m-5 w-full max-w-6xl">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-        <div><h1 className="text-xl font-bold text-text-primary">Hospital Analytics</h1><p className="text-sm text-text-dim mt-0.5">Performance insights for individual hospitals</p></div>
-        <div className="w-full sm:w-64">
-          <select value={selectedHospital} onChange={(e) => { setSelectedHospital(e.target.value); setActiveTab('overview'); }} className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background-card">
+    <PageContainer>
+      <PageHeader
+        title="Hospital Analytics"
+        subtitle="Performance insights for individual hospitals"
+        actions={
+          <select value={selectedHospital} onChange={(e) => { setSelectedHospital(e.target.value); setActiveTab('overview'); }} className="w-full sm:w-64 border border-border rounded-xl px-3.5 py-2.5 text-sm bg-background-card text-text-primary outline-none transition-colors focus:border-primary cursor-pointer">
             <option value="">Select a hospital</option>
             {hospitals.map((h) => (<option key={h._id} value={h._id}>{h.name}</option>))}
           </select>
-        </div>
-      </div>
+        }
+      />
       {!selectedHospital ? (
         <div className="flex flex-col items-center justify-center min-h-[50vh] text-text-dim">
           <Building2 size={48} className="mb-4 opacity-30" /><p className="text-lg">Select a hospital to view analytics</p><p className="text-sm mt-1">Choose a hospital from the dropdown above</p>
@@ -151,7 +153,7 @@ const HospitalAnalytics = () => {
       ) : (
         <div className="flex flex-col items-center justify-center min-h-[50vh] text-text-dim"><p>No data available for this hospital</p></div>
       )}
-    </div>
+    </PageContainer>
   );
 };
 

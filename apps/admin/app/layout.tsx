@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
-import "react-toastify/dist/ReactToastify.css";
 import PanelShell from "@/src/components/PanelShell";
 import Providers from "@/src/components/Providers";
 import RegisterSW from "@/src/components/RegisterSW";

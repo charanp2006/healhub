@@ -5,6 +5,7 @@ import { AdminContext } from '@/src/context/AdminContext';
 import { AppContext } from '@/src/context/AppContext';
 import { assets } from '@/src/assets/assets';
 import { Search, Video, MapPin, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
+import { PageContainer, PageHeader, Card, Badge } from '@/src/components/ui';
 
 const AllAppointments = () => {
   const {aToken, appointments, getAllAppointments, cancelAppointment, doctors, getAllDoctors} = useContext(AdminContext);
@@ -53,15 +54,19 @@ const AllAppointments = () => {
   }, [search]);
 
   const getStatusBadge = (appointment) => {
-    if (appointment.cancelled) return <span className='text-xs px-2 py-0.5 rounded-full bg-red-50 text-red-600 font-medium'>Cancelled</span>;
-    if (appointment.isCompleted) return <span className='text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-600 font-medium'>Completed</span>;
-    if (appointment.rescheduled) return <span className='text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 font-medium'>Rescheduled</span>;
-    return <span className='text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 font-medium'>Active</span>;
+    if (appointment.cancelled) return <Badge tone="rose">Cancelled</Badge>;
+    if (appointment.isCompleted) return <Badge tone="emerald">Completed</Badge>;
+    if (appointment.rescheduled) return <Badge tone="amber">Rescheduled</Badge>;
+    return <Badge tone="blue" dot>Active</Badge>;
   }
 
   return (
-    <div className='w-full max-w-6xl m-5'>
-      <p className='mb-3 text-lg font-medium'>All Appointments <span className='text-sm text-text-secondary font-normal'>({total})</span></p>
+    <PageContainer>
+      <PageHeader
+        title="All Appointments"
+        subtitle="View, filter and manage every booked appointment"
+        actions={<Badge tone="primary" dot>{total} total</Badge>}
+      />
 
       <div className='flex flex-wrap items-center gap-3 mb-4'>
         <div className='relative'>
@@ -87,8 +92,8 @@ const AllAppointments = () => {
         </select>
       </div>
 
-      <div className='bg-background-card border rounded text-sm max-h-[72vh] min-h-[50vh] overflow-y-scroll'>
-        <div className='hidden sm:grid grid-cols-[0.5fr_3fr_1fr_1fr_3fr_3fr_1fr_1fr] grid-flow-col py-3 px-6 border-b bg-background-muted font-medium text-text-secondary'>
+      <Card padded={false} className='text-sm overflow-hidden'>
+        <div className='hidden sm:grid grid-cols-[0.5fr_3fr_1fr_1fr_3fr_3fr_1fr_1fr] grid-flow-col py-3 px-6 border-b bg-background-muted font-medium text-text-secondary uppercase text-[11px] tracking-wide'>
           <p>#</p>
           <p>Patient</p>
           <p>Type</p>
@@ -151,7 +156,7 @@ const AllAppointments = () => {
             </div>
           </div>
         )))}
-      </div>
+      </Card>
 
       {totalPages > 1 && (
         <div className='flex items-center justify-center gap-4 mt-4'>
@@ -199,7 +204,7 @@ const AllAppointments = () => {
           </div>
         </div>
       )}
-    </div>
+    </PageContainer>
   )
 }
 

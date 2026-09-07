@@ -1,18 +1,53 @@
 // @ts-nocheck
 "use client";
 import { useContext, useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AdminContext } from "@/src/context/AdminContext";
 import { AppContext } from "@/src/context/AppContext";
-import { assets } from "@/src/assets/assets";
-import { useRouter } from "next/navigation";
-import { TrendingUp, TrendingDown, Users, CalendarCheck, DollarSign, Building2, Activity, Video, MapPin, ArrowRight } from "lucide-react";
-import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import axios from "axios";
+import {
+  Users,
+  CalendarCheck,
+  DollarSign,
+  Stethoscope,
+  Activity,
+  Video,
+  MapPin,
+  ArrowRight,
+  UserPlus,
+  PlusCircle,
+  FilePlus,
+  RefreshCw,
+  CalendarRange,
+  CreditCard,
+  XCircle,
+  CheckCircle2,
+  Clock,
+} from "lucide-react";
+import {
+  AreaChart,
+  Area,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
 import { SkeletonDashboard } from "@healhub/ui";
+import { Card, StatCard, Badge, CardHeader } from "@/src/components/ui";
+
+const QUICK_ACTIONS = [
+  { label: "Add Doctor", href: "/add-doctor", Icon: UserPlus, tone: "primary" },
+  { label: "Add Hospital", href: "/add-hospital", Icon: PlusCircle, tone: "blue" },
+  { label: "Add Blog", href: "/add-blog", Icon: FilePlus, tone: "violet" },
+  { label: "All Appointments", href: "/all-appointments", Icon: CalendarRange, tone: "amber" },
+];
 
 const Dashboard = () => {
-  const { aToken, cancelAppointment, dashboardData, getDashboardData, backendURL } =
-    useContext(AdminContext);
+  const ctx = useContext(AdminContext);
+  const { aToken, cancelAppointment, dashboardData, getDashboardData, backendURL } = ctx;
   const { slotDateFormat, currencySymbol } = useContext(AppContext);
   const router = useRouter();
 
@@ -20,6 +55,7 @@ const Dashboard = () => {
   const [trends, setTrends] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
   const [dashboardReady, setDashboardReady] = useState(false);
+  const [greeting, setGreeting] = useState("Good morning");
 
   const fetchAnalytics = async () => {
     try {
@@ -32,7 +68,7 @@ const Dashboard = () => {
       if (trendsRes.data.success) setTrends(trendsRes.data.trends);
       if (activityRes.data.success) setRecentActivity(activityRes.data.activities);
     } catch (error) {
-      console.log('Error fetching analytics:', error);
+      console.log("Error fetching analytics:", error);
     } finally {
       setDashboardReady(true);
     }
@@ -43,233 +79,381 @@ const Dashboard = () => {
       getDashboardData();
       fetchAnalytics();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [aToken]);
 
-  const GrowthBadge = ({ value }) => {
-    if (value === 0) return <span className="text-xs text-text-dim">0%</span>;
-    return value > 0
-      ? <span className="flex items-center gap-0.5 text-xs text-green-600 font-medium"><TrendingUp size={12} /> +{value}%</span>
-      : <span className="flex items-center gap-0.5 text-xs text-red-500 font-medium"><TrendingDown size={12} /> {value}%</span>;
+  useEffect(() => {
+    const h = new Date().getHours();
+    if (h < 12) setGreeting("Good morning");
+    else if (h < 17) setGreeting("Good afternoon");
+    else setGreeting("Good evening");
+  }, []);
+
+  const today = new Date().toLocaleDateString(undefined, {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+
+  const statusConfig = {
+    completed: { label: "Completed", tone: "emerald" },
+    cancelled: { label: "Cancelled", tone: "rose" },
+    rescheduled: { label: "Rescheduled", tone: "amber" },
   };
 
-  const getActionColor = (action) => {
-    switch(action) {
-      case 'completed': return 'bg-green-50 text-green-600';
-      case 'cancelled': return 'bg-red-50 text-red-500';
-      case 'rescheduled': return 'bg-amber-50 text-amber-600';
-      default: return 'bg-blue-50 text-blue-600';
-    }
+  const actionIcon = (action) => {
+    if (action === "completed") return <CheckCircle2 size={13} />;
+    if (action === "cancelled") return <XCircle size={13} />;
+    return <Clock size={13} />;
+  };
+
+  const getAppointmentStatus = (appointment) => {
+    if (appointment.cancelled) return { label: "Cancelled", tone: "rose" };
+    if (appointment.isCompleted) return { label: "Completed", tone: "emerald" };
+    if (appointment.rescheduled) return { label: "Rescheduled", tone: "amber" };
+    return { label: "Active", tone: "primary" };
   };
 
   if (!dashboardReady) {
     return (
-      <div className="m-5 w-full max-w-6xl">
+      <div className="px-5 sm:px-6 lg:px-8 py-6 lg:py-8">
         <SkeletonDashboard />
       </div>
     );
   }
 
+  const statTotal = overview?.totalAppointments || 0;
+  const completedPct = statTotal ? Math.round((overview.completedAppointments / statTotal) * 100) : 0;
+  const activePct = statTotal ? Math.round((overview.activeAppointments / statTotal) * 100) : 0;
+  const cancelledPct = statTotal ? Math.round((overview.cancelledAppointments / statTotal) * 100) : 0;
+
   return (
-    <div className="m-5 w-full max-w-6xl">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-background-card rounded-xl border border-border p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
-              <Users size={20} className="text-blue-600" />
-            </div>
-            {overview && <GrowthBadge value={overview.appointmentGrowth} />}
-          </div>
-          <p className="text-2xl font-bold text-text-primary">{overview?.totalPatients ?? '—'}</p>
-          <p className="text-sm text-text-secondary mt-0.5">Total Patients</p>
+    <div className="px-5 sm:px-6 lg:px-8 py-6 lg:py-8 space-y-6">
+      {/* Greeting */}
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-primary">{today}</p>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-text-primary md:text-3xl">
+            {greeting}, Admin 👋
+          </h1>
+          <p className="mt-1 text-sm text-text-secondary">
+            Here&apos;s what&apos;s happening across your platform today.
+          </p>
         </div>
-
-        <div className="bg-background-card rounded-xl border border-border p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
-              <CalendarCheck size={20} className="text-emerald-600" />
-            </div>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 font-medium">{overview?.activeAppointments ?? 0} active</span>
-          </div>
-          <p className="text-2xl font-bold text-text-primary">{overview?.totalAppointments ?? '—'}</p>
-          <p className="text-sm text-text-secondary mt-0.5">Total Appointments</p>
-        </div>
-
-        <div className="bg-background-card rounded-xl border border-border p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <div className="w-10 h-10 rounded-lg bg-violet-50 flex items-center justify-center">
-              <DollarSign size={20} className="text-violet-600" />
-            </div>
-            {overview && <GrowthBadge value={overview.revenueGrowth} />}
-          </div>
-          <p className="text-2xl font-bold text-text-primary">{currencySymbol}{overview?.totalRevenue?.toLocaleString() ?? '—'}</p>
-          <p className="text-sm text-text-secondary mt-0.5">Total Revenue</p>
-        </div>
-
-        <div className="bg-background-card rounded-xl border border-border p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <div className="w-10 h-10 rounded-lg bg-primary-soft flex items-center justify-center">
-              <Building2 size={20} className="text-primary" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-text-primary">{overview?.totalDoctors ?? '—'} <span className="text-sm font-normal text-text-dim">doctors</span></p>
-          <p className="text-sm text-text-secondary mt-0.5">{overview?.totalHospitals ?? 0} hospitals</p>
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={() => {
+              getDashboardData();
+              fetchAnalytics();
+            }}
+            className="inline-flex items-center gap-2 rounded-xl border border-border bg-background-card px-4 py-2 text-sm font-medium text-text-primary transition-colors hover:bg-background-muted cursor-pointer"
+          >
+            <RefreshCw size={15} /> Refresh
+          </button>
+          <Link
+            href="/analytics"
+            className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm shadow-primary/25 transition-all hover:bg-primary-hover cursor-pointer"
+          >
+            View Analytics <ArrowRight size={15} />
+          </Link>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-        <div className="bg-background-card rounded-xl border border-border p-5 shadow-sm lg:col-span-2">
-          <div className="flex items-center justify-between mb-2">
-            <div>
-              <p className="font-semibold text-text-primary">Revenue Trend</p>
-              <p className="text-xs text-text-dim">Last 12 months</p>
-            </div>
-            <button onClick={() => router.push('/analytics')} className="text-xs text-primary font-medium flex items-center gap-1 hover:underline cursor-pointer">
-              View Details <ArrowRight size={12} />
-            </button>
-          </div>
-          <div className="h-48">
+      {/* KPI cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard
+          label="Total Patients"
+          value={overview?.totalPatients?.toLocaleString() ?? "—"}
+          Icon={Users}
+          tone="blue"
+          trend={overview?.appointmentGrowth}
+          caption="Across all hospitals"
+        />
+        <StatCard
+          label="Appointments"
+          value={overview?.totalAppointments?.toLocaleString() ?? "—"}
+          Icon={CalendarCheck}
+          tone="emerald"
+          caption={`${overview?.activeAppointments ?? 0} active right now`}
+        />
+        <StatCard
+          label="Total Revenue"
+          value={`${currencySymbol}${overview?.totalRevenue?.toLocaleString() ?? "0"}`}
+          Icon={DollarSign}
+          tone="violet"
+          trend={overview?.revenueGrowth}
+          caption={`Avg ₹${overview && overview.totalAppointments > 0 ? Math.round(overview.totalRevenue / overview.totalAppointments).toLocaleString() : "0"} per visit`}
+        />
+        <StatCard
+          label="Doctors"
+          value={overview?.totalDoctors?.toLocaleString() ?? "—"}
+          Icon={Stethoscope}
+          tone="primary"
+          caption={`${overview?.totalHospitals ?? 0} registered hospitals`}
+        />
+      </div>
+
+      {/* Charts row */}
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        <Card className="xl:col-span-2" padded={false}>
+          <CardHeader
+            title="Revenue Trend"
+            subtitle="Last 12 months"
+            action={
+              <button
+                onClick={() => router.push("/analytics")}
+                className="flex items-center gap-1 text-xs font-semibold text-primary hover:underline cursor-pointer"
+              >
+                Full details <ArrowRight size={12} />
+              </button>
+            }
+          />
+          <div className="h-64 px-2 py-4">
             {trends.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={trends}>
+                <AreaChart data={trends} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
                   <defs>
-                    <linearGradient id="colorRevenue2" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#20C3AE" stopOpacity={0.3} />
+                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#20C3AE" stopOpacity={0.35} />
                       <stop offset="95%" stopColor="#20C3AE" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#9CA3AF' }} />
-                  <Tooltip
-                    contentStyle={{ borderRadius: '8px', border: '1px solid #E5E7EB', fontSize: '12px' }}
-                    formatter={(value) => [`${currencySymbol}${value.toLocaleString()}`, 'Revenue']}
+                  <XAxis
+                    dataKey="month"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 11, fill: "#9CA3AF" }}
                   />
-                  <Area type="monotone" dataKey="revenue" stroke="#20C3AE" strokeWidth={2} fill="url(#colorRevenue2)" />
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: "12px",
+                      border: "1px solid var(--s-border)",
+                      background: "var(--s-bg-card)",
+                      boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
+                      fontSize: "12px",
+                      color: "var(--s-text-primary)",
+                    }}
+                    formatter={(value) => [`${currencySymbol}${value.toLocaleString()}`, "Revenue"]}
+                    cursor={{ stroke: "var(--primary)", strokeWidth: 1, strokeDasharray: "4 4" }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="#20C3AE"
+                    strokeWidth={2.5}
+                    fill="url(#colorRevenue)"
+                  />
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-full flex items-center justify-center text-text-dim text-sm">No data</div>
+              <div className="flex h-full items-center justify-center text-sm text-text-dim">
+                No data available yet
+              </div>
             )}
           </div>
-        </div>
+        </Card>
 
-        <div className="bg-background-card rounded-xl border border-border p-5 shadow-sm">
-          <p className="font-semibold text-text-primary mb-4">Appointment Summary</p>
-          {overview && (
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-text-secondary">Completed</span>
-                  <span className="font-medium text-green-600">{overview.completedAppointments}</span>
-                </div>
-                <div className="w-full h-2 bg-background-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-green-500 rounded-full" style={{ width: `${overview.totalAppointments ? (overview.completedAppointments / overview.totalAppointments * 100) : 0}%` }} />
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-text-secondary">Active</span>
-                  <span className="font-medium text-blue-600">{overview.activeAppointments}</span>
-                </div>
-                <div className="w-full h-2 bg-background-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-blue-500 rounded-full" style={{ width: `${overview.totalAppointments ? (overview.activeAppointments / overview.totalAppointments * 100) : 0}%` }} />
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-text-secondary">Cancelled</span>
-                  <span className="font-medium text-red-500">{overview.cancelledAppointments}</span>
-                </div>
-                <div className="w-full h-2 bg-background-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-red-400 rounded-full" style={{ width: `${overview.totalAppointments ? (overview.cancelledAppointments / overview.totalAppointments * 100) : 0}%` }} />
-                </div>
-              </div>
-
-              <div className="border-t pt-3 mt-3">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="flex items-center gap-1.5 text-text-secondary"><MapPin size={14} /> In-Person</span>
-                  <span className="font-medium">{overview.inPersonCount}</span>
-                </div>
-                <div className="flex items-center justify-between text-sm mt-2">
-                  <span className="flex items-center gap-1.5 text-text-secondary"><Video size={14} /> Video Call</span>
-                  <span className="font-medium">{overview.videoCount}</span>
+        <Card padded={false}>
+          <CardHeader title="Appointment Summary" subtitle="Current distribution" />
+          <div className="p-5">
+            <div className="flex items-center justify-center">
+              <div className="relative h-40 w-40">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={[
+                        { name: "Completed", value: overview?.completedAppointments ?? 0, fill: "#10b981" },
+                        { name: "Active", value: overview?.activeAppointments ?? 0, fill: "#3b82f6" },
+                        { name: "Cancelled", value: overview?.cancelledAppointments ?? 0, fill: "#ef4444" },
+                      ]}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={52}
+                      outerRadius={72}
+                      paddingAngle={3}
+                      dataKey="value"
+                      strokeWidth={0}
+                    >
+                      {[{ fill: "#10b981" }, { fill: "#3b82f6" }, { fill: "#ef4444" }].map((entry, i) => (
+                        <Cell key={i} fill={entry.fill} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-2xl font-bold text-text-primary">{statTotal}</span>
+                  <span className="text-[11px] text-text-dim">total</span>
                 </div>
               </div>
             </div>
-          )}
-        </div>
+
+            <div className="mt-5 space-y-4">
+              {[
+                { label: "Completed", value: overview?.completedAppointments ?? 0, pct: completedPct, color: "bg-[#10b981]" },
+                { label: "Active", value: overview?.activeAppointments ?? 0, pct: activePct, color: "bg-[#3b82f6]" },
+                { label: "Cancelled", value: overview?.cancelledAppointments ?? 0, pct: cancelledPct, color: "bg-[#ef4444]" },
+              ].map((row) => (
+                <div key={row.label}>
+                  <div className="flex items-center justify-between text-sm mb-1.5">
+                    <span className="flex items-center gap-1.5 text-text-secondary">
+                      <span className={`h-2 w-2 rounded-full ${row.color}`} /> {row.label}
+                    </span>
+                    <span className="font-medium text-text-primary">
+                      {row.value} <span className="text-xs text-text-dim">({row.pct}%)</span>
+                    </span>
+                  </div>
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-background-muted">
+                    <div className={`h-full rounded-full ${row.color}`} style={{ width: `${row.pct}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-5 grid grid-cols-2 gap-3">
+              <div className="rounded-xl bg-background-muted p-3">
+                <div className="flex items-center gap-1.5 text-xs text-text-secondary">
+                  <MapPin size={13} className="text-primary" /> In-person
+                </div>
+                <p className="mt-1 text-lg font-bold text-text-primary">{overview?.inPersonCount ?? 0}</p>
+              </div>
+              <div className="rounded-xl bg-background-muted p-3">
+                <div className="flex items-center gap-1.5 text-xs text-text-secondary">
+                  <Video size={13} className="text-primary" /> Video call
+                </div>
+                <p className="mt-1 text-lg font-bold text-text-primary">{overview?.videoCount ?? 0}</p>
+              </div>
+            </div>
+          </div>
+        </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="bg-background-card rounded-xl border border-border shadow-sm">
-          <div className="flex items-center justify-between p-5 pb-3">
-            <div className="flex items-center gap-2">
-              <Activity size={18} className="text-primary" />
-              <p className="font-semibold text-text-primary">Recent Activity</p>
-            </div>
-          </div>
-          <div className="max-h-80 overflow-y-auto">
+      {/* Bottom row */}
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        {/* Recent activity */}
+        <Card padded={false}>
+          <CardHeader
+            title="Recent Activity"
+            subtitle="Latest platform events"
+            action={
+              <span className="inline-flex items-center gap-1 text-xs text-text-dim">
+                <Activity size={13} className="text-primary" /> live
+              </span>
+            }
+          />
+          <div className="max-h-96 divide-y divide-border overflow-y-auto">
             {recentActivity.length === 0 ? (
-              <p className="p-6 text-text-dim text-center text-sm">No recent activity</p>
+              <p className="px-5 py-12 text-center text-sm text-text-dim">No recent activity</p>
             ) : (
-              recentActivity.slice(0, 8).map((item, index) => (
-                <div key={index} className="flex items-center gap-3 px-5 py-2.5 hover:bg-background-muted border-t border-border">
-                  <img className="w-8 h-8 rounded-full object-cover" src={item.patientImage} alt="" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-text-primary">
-                      <span className="font-medium">{item.patientName}</span>
-                      {' '}<span className={`text-xs px-1.5 py-0.5 rounded ${getActionColor(item.action)}`}>{item.action}</span>{' '}
-                      with <span className="font-medium">{item.doctorName}</span>
+              recentActivity.slice(0, 8).map((item, index) => {
+                const st = statusConfig[item.action] || { label: item.action, tone: "primary" };
+                return (
+                  <div key={index} className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-background-muted">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-background-muted">
+                      <img className="h-9 w-9 rounded-full object-cover" src={item.patientImage} alt="" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm text-text-primary">
+                        <span className="font-semibold">{item.patientName}</span>{" "}
+                        <Badge tone={st.tone} className="mx-1 px-2 py-0">
+                          {actionIcon(item.action)} {st.label}
+                        </Badge>{" "}
+                        with <span className="font-semibold">{item.doctorName}</span>
+                      </p>
+                      <p className="mt-0.5 text-xs text-text-dim">
+                        {item.slotDate} · {item.slotTime}
+                      </p>
+                    </div>
+                    <p className="shrink-0 text-sm font-semibold text-text-primary">
+                      {currencySymbol}{item.amount}
                     </p>
-                    <p className="text-xs text-text-dim mt-0.5">{item.slotDate} | {item.slotTime}</p>
                   </div>
-                  <p className="text-sm font-medium text-text-secondary">{currencySymbol}{item.amount}</p>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
-        </div>
+        </Card>
 
-        <div className="bg-background-card rounded-xl border border-border shadow-sm">
-          <div className="flex items-center gap-2 p-5 pb-3">
-            <img src={assets.list_icon} alt="" className="w-5" />
-            <p className="font-semibold text-text-primary">Latest Bookings</p>
-          </div>
-
-          <div className="max-h-80 overflow-y-auto">
-            {dashboardData && dashboardData.latestAppointments.length === 0 ? (
-              <p className="p-6 text-text-dim text-center text-sm">No appointments found</p>
+        {/* Latest bookings */}
+        <Card padded={false}>
+          <CardHeader
+            title="Latest Bookings"
+            subtitle="Most recent appointments"
+            action={
+              <Link href="/all-appointments" className="flex items-center gap-1 text-xs font-semibold text-primary hover:underline cursor-pointer">
+                View all <ArrowRight size={12} />
+              </Link>
+            }
+          />
+          <div className="max-h-96 divide-y divide-border overflow-y-auto">
+            {!dashboardData || dashboardData.latestAppointments?.length === 0 ? (
+              <p className="px-5 py-12 text-center text-sm text-text-dim">No appointments found</p>
             ) : (
-              dashboardData && dashboardData.latestAppointments.map((appointment, index) => (
-                <div
-                  key={index}
-                  className="flex items-center px-5 py-2.5 gap-3 hover:bg-background-muted border-t border-border"
-                >
-                  <img
-                    className="rounded-full bg-background-muted w-8 h-8 object-cover"
-                    src={appointment.docData.image}
-                    alt=""
-                  />
-                  <div className="flex-1 text-sm">
-                    <p className="font-medium text-text-primary">{appointment.docData.name}</p>
-                    <p className="text-xs text-text-dim">{slotDateFormat(appointment.slotDate)}</p>
+              dashboardData.latestAppointments.map((appointment, index) => {
+                const st = getAppointmentStatus(appointment);
+                return (
+                  <div key={index} className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-background-muted">
+                    <img className="h-10 w-10 shrink-0 rounded-full bg-background-muted object-cover" src={appointment.docData.image} alt="" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-text-primary">{appointment.docData.name}</p>
+                      <p className="truncate text-xs text-text-dim">
+                        {appointment.docData.speciality} · {slotDateFormat(appointment.slotDate)}
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <Badge tone={st.tone} dot>{st.label}</Badge>
+                      {!appointment.cancelled && !appointment.isCompleted && (
+                        <button
+                          onClick={() => cancelAppointment(appointment._id)}
+                          title="Cancel appointment"
+                          className="flex h-7 w-7 items-center justify-center rounded-lg text-text-dim transition-colors hover:bg-[#ef4444]/10 hover:text-[#ef4444] cursor-pointer"
+                        >
+                          <XCircle size={15} />
+                        </button>
+                      )}
+                    </div>
                   </div>
-                  {appointment.cancelled ? (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-red-50 text-red-500 font-medium">Cancelled</span>
-                  ) : appointment.isCompleted ? (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-600 font-medium">Completed</span>
-                  ) : (
-                    <img
-                      onClick={() => cancelAppointment(appointment._id)}
-                      className="w-8 cursor-pointer"
-                      src={assets.cancel_icon}
-                      alt=""
-                    />
-                  )}
-                </div>
-              ))
+                );
+              })
             )}
           </div>
-        </div>
+        </Card>
+
+        {/* Quick actions */}
+        <Card padded={false}>
+          <CardHeader title="Quick Actions" subtitle="Common admin tasks" />
+          <div className="grid grid-cols-2 gap-3 p-5">
+            {QUICK_ACTIONS.map(({ label, href, Icon }) => (
+              <Link
+                key={href}
+                href={href}
+                className="group flex flex-col items-start gap-2.5 rounded-2xl border border-border bg-background-card p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
+              >
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+                  <Icon size={19} />
+                </span>
+                <span className="text-sm font-medium text-text-primary">{label}</span>
+                <span className="flex items-center gap-1 text-xs text-text-dim">
+                  Open <ArrowRight size={11} className="transition-transform group-hover:translate-x-0.5" />
+                </span>
+              </Link>
+            ))}
+
+            <Link
+              href="/billing"
+              className="group col-span-2 flex items-center gap-3 rounded-2xl border border-border p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
+            >
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#8b5cf6]/10 text-[#8b5cf6]">
+                <CreditCard size={19} />
+              </span>
+              <span className="flex-1">
+                <span className="block text-sm font-medium text-text-primary">Billing & Invoices</span>
+                <span className="block text-xs text-text-dim">Manage payments and invoices</span>
+              </span>
+              <ArrowRight size={16} className="text-text-dim" />
+            </Link>
+          </div>
+        </Card>
       </div>
     </div>
   );

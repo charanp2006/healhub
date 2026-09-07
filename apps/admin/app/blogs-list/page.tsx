@@ -3,10 +3,10 @@
 import { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "@/src/components/ui/Toast";
 import { AdminContext } from "@/src/context/AdminContext";
 import { Search, SlidersHorizontal, Pencil, Trash2, Eye, ChevronDown, ChevronLeft, ChevronRight, FileText } from "lucide-react";
-import { SkeletonCount } from "@healhub/ui";
+import { PageContainer, PageHeader, Card, Badge } from "@/src/components/ui";
 
 const categories = ["Health Tips","Nutrition","Mental Health","Fitness","Disease Awareness","Medical News","Hospital Updates","Other"];
 
@@ -56,16 +56,19 @@ const BlogsList = () => {
   };
 
   return (
-    <div className="m-5 w-full max-w-6xl">
-      <div className="flex items-center justify-between mb-5">
-        <h1 className="text-lg font-medium">All Blog Posts</h1>
-        <div className="flex items-center gap-3">
-          <button onClick={() => setShowFilters((v) => !v)} className="flex items-center gap-2 text-sm text-text-secondary border border-border px-3 py-1.5 rounded-full cursor-pointer hover:bg-primary-soft transition-colors">
-            <SlidersHorizontal size={14} />{showFilters ? "Hide Filters" : "Filters"}
-          </button>
-          <button onClick={() => router.push("/add-blog")} className="flex items-center gap-2 text-sm bg-primary text-white px-4 py-1.5 rounded-full cursor-pointer hover:bg-primary-hover transition-colors">+ New Post</button>
-        </div>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title="Blog Posts"
+        subtitle={`${totalCount} posts published across the platform`}
+        actions={
+          <>
+            <button onClick={() => setShowFilters((v) => !v)} className="flex items-center gap-2 text-sm text-text-secondary border border-border px-3.5 py-2 rounded-xl cursor-pointer hover:bg-background-muted transition-colors">
+              <SlidersHorizontal size={14} />{showFilters ? "Hide Filters" : "Filters"}
+            </button>
+            <button onClick={() => router.push("/add-blog")} className="flex items-center gap-2 text-sm bg-primary text-white px-4 py-2 rounded-xl cursor-pointer hover:bg-primary-hover transition-colors">+ New Post</button>
+          </>
+        }
+      />
       {showFilters && (
         <form onSubmit={handleSearch} className="bg-background-card border border-border rounded-lg p-5 mb-6 flex flex-col gap-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -92,9 +95,9 @@ const BlogsList = () => {
           </div>
         </form>
       )}
-      <p className="text-sm text-text-secondary mb-4">{loading ? <SkeletonCount /> : `${totalCount} post${totalCount !== 1 ? "s" : ""} total`}</p>
-      <div className="bg-background-card border border-border rounded-lg overflow-hidden">
-        <div className="hidden sm:grid grid-cols-[3fr_1.5fr_1fr_1fr_1fr_auto] gap-2 py-3 px-6 border-b border-border text-sm font-medium text-text-secondary">
+      <p className="text-sm text-text-secondary mb-4">{loading ? "Loading posts..." : `${totalCount} post${totalCount !== 1 ? "s" : ""} total`}</p>
+      <Card padded={false} className="overflow-hidden">
+        <div className="hidden sm:grid grid-cols-[3fr_1.5fr_1fr_1fr_1fr_auto] gap-2 py-3 px-6 border-b border-border text-[11px] font-semibold uppercase tracking-wide text-text-secondary">
           <p>Title</p><p>Category</p><p>Status</p><p>Views</p><p>Date</p><p>Actions</p>
         </div>
         {blogs.length === 0 ? (
@@ -107,9 +110,7 @@ const BlogsList = () => {
                 <p className="font-medium text-text-primary truncate">{blog.title}</p>
               </div>
               <p className="text-text-secondary">{blog.category}</p>
-              <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full w-fit ${blog.isPublished ? "bg-green-50 text-green-600" : "bg-yellow-50 text-yellow-600"}`}>
-                <span className={`w-1.5 h-1.5 rounded-full ${blog.isPublished ? "bg-green-500" : "bg-yellow-500"}`} />{blog.isPublished ? "Published" : "Draft"}
-              </span>
+              <Badge tone={blog.isPublished ? "emerald" : "amber"} dot>{blog.isPublished ? "Published" : "Draft"}</Badge>
               <p className="flex items-center gap-1 text-text-secondary"><Eye size={12} /> {blog.views || 0}</p>
               <p className="text-text-secondary">{formatDate(blog.publishedAt || blog.createdAt)}</p>
               <div className="flex items-center gap-3">
@@ -119,7 +120,7 @@ const BlogsList = () => {
             </div>
           ))
         )}
-      </div>
+      </Card>
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-4 mt-6">
           <button disabled={page <= 1} onClick={() => fetchBlogs(page - 1)} className="flex items-center gap-1 px-3 py-1.5 text-sm border border-border rounded-full disabled:opacity-40 cursor-pointer hover:bg-primary-soft transition-colors"><ChevronLeft size={14} /> Prev</button>
@@ -127,7 +128,7 @@ const BlogsList = () => {
           <button disabled={page >= totalPages} onClick={() => fetchBlogs(page + 1)} className="flex items-center gap-1 px-3 py-1.5 text-sm border border-border rounded-full disabled:opacity-40 cursor-pointer hover:bg-primary-soft transition-colors">Next <ChevronRight size={14} /></button>
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 };
 

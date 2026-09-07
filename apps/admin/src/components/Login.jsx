@@ -3,7 +3,7 @@ import { useState, useEffect, useContext } from "react";
 import { BRAND_LOGO, LOGO_ALT } from "@healhub/ui/images";
 import { AdminContext } from "@/src/context/AdminContext";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "@/src/components/ui/Toast";
 import { Eye, EyeOff, Shield, Loader2 } from "lucide-react";
 
 const Login = () => {
@@ -89,7 +89,7 @@ const Login = () => {
           </div>
 
           <div className="mb-6">
-            <div className="w-fit flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 text-sm font-medium">
+            <div className="w-fit flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/15 text-primary text-sm font-medium">
               <Shield size={16} />
               Admin
             </div>
@@ -155,7 +155,7 @@ const Login = () => {
           </div>
 
           <button
-            className="w-full mt-6 py-2.5 bg-primary text-white font-medium rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full mt-6 py-2.5 bg-primary text-white font-medium rounded-xl shadow-sm shadow-primary/25 hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
             type="submit"
             disabled={loading}
           >

@@ -2,10 +2,11 @@
 "use client";
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "@/src/components/ui/Toast";
 import { AdminContext } from "@/src/context/AdminContext";
 import { Search, SlidersHorizontal, MapPin, BedDouble, Star, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
-import { SkeletonCount, SkeletonCards } from "@healhub/ui";
+import { Skeleton } from "@healhub/ui";
+import { PageContainer, PageHeader, Badge } from "@/src/components/ui";
 
 const specialties = ["General Physician","Gynecologist","Dermatologist","Pediatrician","Neurologist","Gastroenterologist"];
 
@@ -62,14 +63,17 @@ const HospitalsList = () => {
   };
 
   return (
-    <div className="m-5 w-full max-w-6xl">
-      <div className="flex items-center justify-between mb-5">
-        <h1 className="text-lg font-medium">All Hospitals</h1>
-        <button onClick={() => setShowFilters((v) => !v)} className="flex items-center gap-2 text-sm text-text-secondary border border-border px-3 py-1.5 rounded-full cursor-pointer hover:bg-primary-soft transition-colors">
-          <SlidersHorizontal size={14} />
-          {showFilters ? "Hide Filters" : "Filters"}
-        </button>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title="All Hospitals"
+        subtitle="Browse every hospital and clinic on the platform"
+        actions={
+          <button onClick={() => setShowFilters((v) => !v)} className="flex items-center gap-2 text-sm text-text-secondary border border-border px-3.5 py-2 rounded-xl cursor-pointer hover:bg-background-muted transition-colors">
+            <SlidersHorizontal size={14} />
+            {showFilters ? "Hide Filters" : "Filters"}
+          </button>
+        }
+      />
       {showFilters && (
         <form onSubmit={handleSearch} className="bg-background-card border border-border rounded-lg p-5 mb-6 flex flex-col gap-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -116,11 +120,32 @@ const HospitalsList = () => {
         </form>
       )}
       <p className="text-sm text-text-secondary mb-4">
-        {loading ? <SkeletonCount /> : `${totalCount} hospital${totalCount !== 1 ? "s" : ""} found`}
+        {loading ? "Loading hospitals..." : `${totalCount} hospital${totalCount !== 1 ? "s" : ""} found`}
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {loading ? (
-          <SkeletonCards count={6} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" />
+          Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="border border-border rounded-xl overflow-hidden bg-background-card">
+              <Skeleton className="h-40 w-full rounded-none" />
+              <div className="p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Skeleton className="h-5 w-20 rounded-full" />
+                  <Skeleton className="h-5 w-20 rounded-full" />
+                </div>
+                <Skeleton className="h-5 w-3/4" />
+                <Skeleton className="mt-2 h-4 w-1/2" />
+                <div className="flex items-center justify-between mt-4 pt-0">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-4 w-16" />
+                </div>
+                <div className="flex flex-wrap gap-1.5 mt-4">
+                  <Skeleton className="h-6 w-16 rounded-full" />
+                  <Skeleton className="h-6 w-20 rounded-full" />
+                  <Skeleton className="h-6 w-14 rounded-full" />
+                </div>
+              </div>
+            </div>
+          ))
         ) : hospitals.map((h) => (
           <div key={h._id} className="border border-border rounded-xl overflow-hidden bg-background-card hover:-translate-y-1 transition-all duration-300 group">
             <div className="h-40 bg-primary-soft overflow-hidden">
@@ -132,13 +157,12 @@ const HospitalsList = () => {
             </div>
             <div className="p-4">
               <div className="flex items-center gap-2 mb-2">
-                <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ${h.isRegistered ? "bg-green-50 text-green-600" : "bg-red-50 text-red-500"}`}>
-                  <span className={`w-1.5 h-1.5 rounded-full ${h.isRegistered ? "bg-green-500" : "bg-red-400"}`} />
+                <Badge tone={h.isRegistered ? "emerald" : "rose"} dot>
                   {h.isRegistered ? "Registered" : "Unregistered"}
-                </span>
-                <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ${h.isAvailable ? 'bg-green-50 text-green-600' : 'bg-background-muted text-text-secondary'}`}>
+                </Badge>
+                <Badge tone={h.isAvailable ? "emerald" : "slate"} dot>
                   {h.isAvailable ? 'Available' : 'Not Available'}
-                </span>
+                </Badge>
               </div>
               <p className="text-text-primary font-medium text-base truncate">{h.name}</p>
               <p className="flex items-center gap-1 text-sm text-text-secondary mt-0.5"><MapPin size={12} /> {h.city}</p>
@@ -180,7 +204,7 @@ const HospitalsList = () => {
           </button>
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 };
 

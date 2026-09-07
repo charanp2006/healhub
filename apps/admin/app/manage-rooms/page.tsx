@@ -1,10 +1,11 @@
 // @ts-nocheck
 "use client";
 import { useContext, useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { toast } from "@/src/components/ui/Toast";
 import axios from "axios";
 import { AdminContext } from "@/src/context/AdminContext";
 import { BedDouble, PlusCircle, Pencil, UserPlus, UserMinus, History, ChevronDown } from "lucide-react";
+import { PageContainer, PageHeader } from "@/src/components/ui";
 
 const ManageRooms = () => {
   const { backendURL, aToken } = useContext(AdminContext);
@@ -101,8 +102,8 @@ const ManageRooms = () => {
   const totalPages = Math.ceil(historyTotal / 10);
 
   return (
-    <div className="m-5 w-full max-w-6xl">
-      <h1 className="text-lg font-medium mb-4">Manage Rooms & Beds</h1>
+    <PageContainer>
+      <PageHeader title="Manage Rooms & Beds" subtitle="Assign, admit and manage hospital bed allocations" />
       <div className="mb-6 max-w-sm">
         <label className="block text-sm text-text-secondary mb-1">Select Hospital</label>
         <div className="relative">
@@ -214,7 +215,7 @@ const ManageRooms = () => {
           )}
         </>
       )}
-    </div>
+    </PageContainer>
   );
 };
 
