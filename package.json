@@ -1,6 +1,6 @@
 {
   "name": "healhub",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "description": "Healhub - Hospital Management & Healthcare Booking Platform (monorepo)",
   "scripts": {
