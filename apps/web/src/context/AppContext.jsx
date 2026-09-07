@@ -28,8 +28,17 @@ const AppContextProvider = ({ children }) => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
-      console.log("Error while fetching doctors data", error);
+      console.log("Error while fetching doctors data", {
+        message: error.message,
+        status: error.response?.status,
+        body: error.response?.data,
+        fromServer: Boolean(error.response),
+      });
+      toast.error(
+        error.response
+          ? `Request failed (${error.response.status})`
+          : "Network error while loading doctors"
+      );
     }
   };
 
