@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Releases are tagged as `vX.Y.Z` on git. See `docs/versioning.md` for how to
 maintain this file and release a new version.
 
+## [0.4.0](https://github.com/charanp2006/healhub/compare/HealHub-v0.3.0...HealHub-v0.4.0) (2026-09-07)
+
+
+### Features
+
+* shared theme system, 404 pages, splash migration, and UI refresh ([abe9c86](https://github.com/charanp2006/healhub/commit/abe9c865618503701a7d2ed0b6c85554f4c5091f))
+
+
+### Bug Fixes
+
+* **web:** add error diagnostics for doctor list 401 ([8895f14](https://github.com/charanp2006/healhub/commit/8895f14a542cfec58498a01e18c28f09d26e1659))
+* **web:** add error diagnostics for doctor list 401 ([539d698](https://github.com/charanp2006/healhub/commit/539d6989f7e54514ee016f503a61044d89edc281))
+
 ## [0.3.0](https://github.com/charanp2006/healhub/compare/HealHub-v0.2.0...HealHub-v0.3.0) (2026-09-06)
 
 
