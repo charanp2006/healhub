@@ -5,7 +5,7 @@ import { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import Header from "@/src/components/Header";
 import MobileHomeHero from "@/src/components/MobileHomeHero";
-import SplashScreen from "@/src/components/SplashScreen";
+import { SplashScreen } from "@healhub/ui/splash";
 import StatsButtons from "@/src/components/StatsButtons";
 import StatsCarousel from "@/src/components/StatsCarousel";
 import SpecialityMenu from "@/src/components/SpecialityMenu";

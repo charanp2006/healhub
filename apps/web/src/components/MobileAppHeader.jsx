@@ -10,6 +10,7 @@ import { useContext } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { ChevronLeft, UserRound } from "lucide-react";
 import { LOGO as HealhubLogo, LOGO_ALT } from "@healhub/ui/images";
+import { ThemeToggle } from "@healhub/ui/theme";
 import { assets } from "@/src/assets/assets";
 import { AppContext } from "@/src/context/AppContext";
 
@@ -41,27 +42,30 @@ const MobileAppHeader = () => {
           </button>
         )}
 
-        {token && userData ? (
-          <button
-            onClick={() => router.push("/my-profile")}
-            className="p-1.5 touch-none-outline"
-            aria-label="Profile"
-          >
-            <img
-              className="w-8 h-8 rounded-full object-cover border border-border"
-              src={userData.image ? userData.image : assets.upload_icon.src}
-              alt=""
-            />
-          </button>
-        ) : (
-          <button
-            onClick={() => router.push("/login")}
-            className="p-1.5 text-[#179E8D] touch-none-outline"
-            aria-label="Login"
-          >
-            <UserRound size={24} />
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          <ThemeToggle size={20} />
+          {token && userData ? (
+            <button
+              onClick={() => router.push("/my-profile")}
+              className="p-1.5 touch-none-outline"
+              aria-label="Profile"
+            >
+              <img
+                className="w-8 h-8 rounded-full object-cover border border-border"
+                src={userData.image ? userData.image : assets.upload_icon.src}
+                alt=""
+              />
+            </button>
+          ) : (
+            <button
+              onClick={() => router.push("/login")}
+              className="p-1.5 text-[#179E8D] touch-none-outline"
+              aria-label="Login"
+            >
+              <UserRound size={24} />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

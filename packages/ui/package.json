@@ -9,7 +9,13 @@
     "./images": "./src/images.ts",
     "./theme": "./src/theme.tsx",
     "./theme.css": "./src/theme.css",
-    "./mobile.css": "./src/mobile.css"
+    "./mobile.css": "./src/mobile.css",
+    "./splash": "./src/splash.tsx",
+    "./not-found": "./src/not-found.tsx",
+    "./landing": "./src/landing.tsx",
+    "./retro-grid": "./src/retro-grid.tsx",
+    "./brand": "./src/brand.tsx",
+    "./compass": "./src/compass.tsx"
   },
   "files": ["src"],
   "peerDependencies": {
@@ -17,7 +23,7 @@
     "react-dom": "^19.0.0"
   },
   "dependencies": {
-    "lucide-react": "^0.468.0",
-    "next-themes": "^0.4.6"
+    "framer-motion": "^11.18.2",
+    "lucide-react": "^0.468.0"
   }
 }

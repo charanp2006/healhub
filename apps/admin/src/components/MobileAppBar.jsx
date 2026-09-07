@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { LogOut, ShieldCheck } from "lucide-react";
 import { LOGO, LOGO_ALT } from "@healhub/ui/images";
+import { ThemeToggle } from "@healhub/ui/theme";
 import { AdminContext } from "@/src/context/AdminContext";
 
 // Mobile-only sticky app bar. Desktop layout is untouched.
@@ -32,6 +33,7 @@ const MobileAppBar = () => {
         </button>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle size={20} />
           <span className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-primary-soft text-[#179E8D] font-medium">
             <ShieldCheck size={13} />
             Admin

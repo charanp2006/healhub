@@ -2,6 +2,8 @@
 @import "@healhub/ui/theme.css";
 @import "@healhub/ui/mobile.css";
 
+@source "../../../packages/ui";
+
 body {
   background-color: var(--s-bg-base);
 }
