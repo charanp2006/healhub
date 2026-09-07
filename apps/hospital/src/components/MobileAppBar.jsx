@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { LogOut } from "lucide-react";
 import { LOGO, LOGO_ALT } from "@healhub/ui/images";
+import { ThemeToggle } from "@healhub/ui/theme";
 import { AdminContext } from "@/src/context/AdminContext";
 import { DoctorContext } from "@/src/context/DoctorContext";
 import { HospitalContext } from "@/src/context/HospitalContext";
@@ -50,6 +51,7 @@ const MobileAppBar = () => {
         </button>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle size={20} />
           <span className="flex items-center justify-center text-xs px-2.5 py-1 rounded-full bg-primary-soft text-[#179E8D] font-medium">
             {role}
           </span>

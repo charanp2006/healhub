@@ -177,3 +177,130 @@ input[type="password"]::-webkit-textfield-decoration-container,
 input[type="password"]::-webkit-privacy-sanitizer {
   display: none !important;
 }
+
+/* =====================
+   SKELETON LOADING (framer-style animated placeholders)
+   Base block on `.skeleton`; the shimmer/pulse/wave/fade overlays are
+   rendered by framer-motion in skeletons.tsx. Theme-aware + dark safe.
+  ====================== */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--s-bg-muted);
+  isolation: isolate;
+}
+
+:root {
+  --s-skel-highlight: rgba(255, 255, 255, 0.6);
+}
+.dark {
+  --s-skel-highlight: rgba(255, 255, 255, 0.07);
+}
+
+/* =====================
+   BRAND WORDMARK (animated gradient "Healhub")
+   Used on landing pages, 404 pages and any brand spotlight.
+  ====================== */
+.brand-gradient {
+  background: linear-gradient(
+    180deg,
+    var(--primary) 0%,
+    var(--primary-hover) 62%,
+    var(--primary-soft-dark) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+  opacity: 0;
+  animation: surface 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+}
+@keyframes surface {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* =====================
+   SPLASH SCREEN
+  ====================== */
+@keyframes splash-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+@keyframes splash-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =====================
+   ANIMATED COMPASS (interactive 404 needle)
+   Bobbing float, spinner settle, then the needle points at the cursor
+   (tracking mode toggled by compass.tsx after the settle animation).
+  ====================== */
+/* outlined heart / plus glyphs on the 404 page:
+   transparent fill, only the border painted via -webkit-text-stroke */
+.heart-stroke,
+.plus-stroke {
+  color: transparent;
+  -webkit-text-stroke-width: 1.5px;
+  -webkit-text-stroke-color: color-mix(in srgb, var(--primary) 65%, transparent);
+  opacity: 0.7;
+  filter: drop-shadow(0 6px 10px rgba(32, 195, 174, 0.18));
+}
+.compass-wrap {
+  width: 104px;
+  height: 104px;
+  filter: drop-shadow(0 14px 20px rgba(19, 78, 74, 0.18));
+  animation: bob 5.5s ease-in-out infinite;
+}
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-3deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(3deg);
+  }
+}
+.needle {
+  transform-origin: 52px 52px;
+  animation: spin-settle 2.6s cubic-bezier(0.2, 0.9, 0.25, 1) 0.3s both;
+}
+.needle.tracking {
+  animation: none;
+  transition: transform 0.55s cubic-bezier(0.34, 1.4, 0.4, 1);
+}
+@keyframes spin-settle {
+  0% {
+    transform: rotate(0deg);
+  }
+  55% {
+    transform: rotate(390deg);
+  }
+  75% {
+    transform: rotate(330deg);
+  }
+  100% {
+    transform: rotate(352deg);
+  }
+}
