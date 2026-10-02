@@ -1,18 +1,28 @@
 // @ts-nocheck
 "use client";
 
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AppContext } from "@/src/context/AppContext";
 import { assets } from "@/src/assets/assets";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "@/src/components/ui/Toast";
 
 const MyProfile = () => {
+  const router = useRouter();
   const { userData, setUserData, token, backendURL, loadUserProfileData } =
     useContext(AppContext);
 
   const [isEdit, setIsEdit] = useState(false);
   const [image, setImage] = useState(false);
+
+  useEffect(() => {
+    if (!token) {
+      router.replace("/login");
+    }
+  }, [token, router]);
+
+  if (!userData) return null;
 
   const updateUserProfileData = async () => {
     if (
@@ -57,7 +67,6 @@ const MyProfile = () => {
   };
 
   return (
-    userData && (
       <div className="max-w-lg flex flex-col gap-2 text-sm pt-5">
         {isEdit ? (
           <label htmlFor="image">
@@ -222,8 +231,7 @@ const MyProfile = () => {
             </button>
           )}
         </div>
-      </div>
-    )
+    </div>
   );
 };
 

@@ -2,7 +2,7 @@
 
 import { createContext, useEffect, useState } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "@/src/components/ui/Toast";
 import { backendURL } from "@/src/lib/api";
 
 export const AppContext = createContext();
@@ -11,12 +11,12 @@ const AppContextProvider = ({ children }) => {
   const currencySymbol = "₹";
 
   const [doctors, setDoctors] = useState([]);
-  const [token, setToken] = useState(false);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("token");
-    if (stored) setToken(stored);
-  }, []);
+  const [token, setToken] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("token") || false;
+    }
+    return false;
+  });
   const [userData, setUserData] = useState(false);
 
   const getDoctorsData = async () => {

@@ -44,7 +44,6 @@ const hospitalSchema = new mongoose.Schema(
 );
 
 hospitalSchema.index({ location: "2dsphere" });
-hospitalSchema.index({ email: 1 });
 hospitalSchema.index({ name: 1 });
 hospitalSchema.index({ city: 1 });
 hospitalSchema.index({ specialties: 1 });

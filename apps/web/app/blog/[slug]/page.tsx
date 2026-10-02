@@ -4,7 +4,7 @@
 import { useContext, useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "@/src/components/ui/Toast";
 import { AppContext } from "@/src/context/AppContext";
 import { SkeletonArticle } from "@healhub/ui";
 import {

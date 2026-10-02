@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
-import "react-toastify/dist/ReactToastify.css";
 import AppContextProvider from "@/src/context/AppContext";
 import { ThemeProvider } from "@healhub/ui/theme";
 import Navbar from "@/src/components/Navbar";
@@ -42,22 +41,23 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <AppContextProvider>
-            <div className="mx-0 sm:mx-[3%] bg-background-base md:bg-background-card min-h-screen">
-              <ToastWrapper />
-              <MobileAppHeader />
-              <div className="hidden md:block">
-                <Navbar />
+            <ToastWrapper>
+              <div className="mx-0 sm:mx-[3%] bg-background-base md:bg-background-card min-h-screen">
+                <MobileAppHeader />
+                <div className="hidden md:block">
+                  <Navbar />
+                </div>
+                <main className="min-h-screen px-4 md:px-0 pb-[96px] md:pb-0">
+                  {children}
+                </main>
+                <div className="hidden md:block">
+                  <Footer />
+                </div>
+                <FloatingDemoButton />
+                <MobileTabBar />
               </div>
-              <main className="min-h-screen px-4 md:px-0 pb-[96px] md:pb-0">
-                {children}
-              </main>
-              <div className="hidden md:block">
-                <Footer />
-              </div>
-              <FloatingDemoButton />
-              <MobileTabBar />
-            </div>
-            <RegisterSW />
+              <RegisterSW />
+            </ToastWrapper>
           </AppContextProvider>
         </ThemeProvider>
       </body>

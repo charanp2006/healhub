@@ -22,6 +22,34 @@ const parseNumber = (value: unknown) => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
+async function enrichDoctorCounts(
+  hospitals: Array<Record<string, any>>
+): Promise<Array<Record<string, any>>> {
+  const hospitalIds = hospitals.map((h) => h._id);
+  if (hospitalIds.length === 0) return hospitals;
+  const groups = await doctorModel.aggregate([
+    { $match: { hospitalId: { $in: hospitalIds } } },
+    {
+      $group: {
+        _id: "$hospitalId",
+        total: { $sum: 1 },
+        available: {
+          $sum: { $cond: [{ $eq: ["$available", true] }, 1, 0] },
+        },
+      },
+    },
+  ]);
+  const countMap = new Map(groups.map((g) => [String(g._id), g]));
+  return hospitals.map((h) => {
+    const counts = countMap.get(String(h._id));
+    return {
+      ...h,
+      doctorsCount: counts?.total || 0,
+      availableDoctors: counts?.available || 0,
+    };
+  });
+}
+
 export async function addHospital(request: Request): Promise<Response> {
   try {
     await connectDB();
@@ -214,9 +242,10 @@ export async function listHospitals(request: Request): Promise<Response> {
 
       const [result] = await hospitalModel.aggregate(geoPipeline);
       const totalCount = result?.total?.[0]?.count || 0;
+      const enrichedHospitals = await enrichDoctorCounts(result?.data || []);
       return json({
         success: true,
-        hospitals: result?.data || [],
+        hospitals: enrichedHospitals,
         pagination: { page: pageNumber, limit: limitNumber, total: totalCount },
       }, undefined, request);
     }
@@ -228,9 +257,11 @@ export async function listHospitals(request: Request): Promise<Response> {
       .skip(skipCount)
       .limit(limitNumber);
     const totalCount = await hospitalModel.countDocuments(matchStage);
+    const hospitalDocs = hospitals.map((h) => h.toObject());
+    const enrichedHospitals = await enrichDoctorCounts(hospitalDocs);
     return json({
       success: true,
-      hospitals,
+      hospitals: enrichedHospitals,
       pagination: { page: pageNumber, limit: limitNumber, total: totalCount },
     }, undefined, request);
   } catch (error) {
@@ -254,7 +285,17 @@ export async function getHospitalProfile(
     const doctors = await doctorModel
       .find({ hospitalId })
       .select(["-password", "-email"]);
-    return json({ success: true, hospital, doctors }, undefined, request);
+    return json(
+      {
+        success: true,
+        hospital,
+        doctors,
+        doctorsCount: doctors.length,
+        availableDoctors: doctors.filter((d) => d.available).length,
+      },
+      undefined,
+      request
+    );
   } catch (error) {
     console.log("Error in getHospitalProfile:", error);
     return json({ success: false, message: (error as Error).message }, undefined, request);

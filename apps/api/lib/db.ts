@@ -71,14 +71,35 @@ async function resolveMongoURI(): Promise<string> {
 const cached: { conn: typeof mongoose | null; promise: Promise<typeof mongoose> | null } =
   globalThis.mongooseGlobal ?? (globalThis.mongooseGlobal = { conn: null, promise: null });
 
+// Fail fast instead of queueing operations on a stale/dropped socket for 10s
+// (the default `bufferCommands` behavior), which made the API feel dead while
+// the Atlas connection was recovering.
+mongoose.set("bufferCommands", false);
+mongoose.set("bufferTimeoutMS", 0);
+
+const MONGO_OPTIONS: mongoose.ConnectOptions = {
+  serverSelectionTimeoutMS: 8000,
+  connectTimeoutMS: 8000,
+  socketTimeoutMS: 0,
+  // Atlas DNS records can resolve to IPv6 which some networks drop silently —
+  // force IPv4 to avoid intermittent "could not connect to any servers".
+  family: 4,
+  retryWrites: true,
+  retryReads: true,
+  maxPoolSize: 10,
+};
+
 export async function connectDB(): Promise<typeof mongoose> {
-  if (cached.conn) {
+  if (cached.conn && mongoose.connection.readyState === 1) {
     return cached.conn;
   }
 
+  // Connection is missing, mid-connect, or has dropped — ensure we reconnect
+  // instead of handing out a stale instance whose operations will buffer/time out.
+  cached.conn = null;
   if (!cached.promise) {
     const uri = resolvedURI ?? (resolvedURI = await resolveMongoURI());
-    cached.promise = mongoose.connect(uri).then((instance) => instance);
+    cached.promise = mongoose.connect(uri, MONGO_OPTIONS).then(() => mongoose);
   }
 
   try {
@@ -88,7 +109,24 @@ export async function connectDB(): Promise<typeof mongoose> {
     throw e;
   }
 
+  if (mongoose.connection.readyState !== 1) {
+    cached.conn = null;
+    cached.promise = null;
+    return connectDB();
+  }
+
   return cached.conn;
 }
+
+const resetCache = () => {
+  cached.conn = null;
+  cached.promise = null;
+};
+
+mongoose.connection.on("disconnected", resetCache);
+mongoose.connection.on("reconnected", () => {});
+mongoose.connection.on("error", (err) => {
+  console.error("MongoDB connection error:", err);
+});
 
 export default connectDB;

@@ -43,7 +43,11 @@ export async function doctorList(request: Request): Promise<Response> {
     return json({ success: true, doctors }, undefined, request);
   } catch (error) {
     console.log("Error in doctorList:", error);
-    return bad((error as Error).message, request);
+    return json(
+      { success: false, message: (error as Error).message },
+      500,
+      request
+    );
   }
 }
 
