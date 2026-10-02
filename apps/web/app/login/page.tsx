@@ -4,7 +4,7 @@
 import { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "@/src/components/ui/Toast";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { AppContext } from "@/src/context/AppContext";
 

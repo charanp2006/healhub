@@ -13,8 +13,7 @@ const Providers = ({ children }) => {
         <DoctorContextProvider>
           <HospitalContextProvider>
             <AppContextProvider>
-              <ToastWrapper />
-              {children}
+              <ToastWrapper>{children}</ToastWrapper>
             </AppContextProvider>
           </HospitalContextProvider>
         </DoctorContextProvider>

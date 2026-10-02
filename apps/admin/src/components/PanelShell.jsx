@@ -1,10 +1,10 @@
 "use client";
-import { useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { usePathname } from "next/navigation";
 import { AdminContext } from "@/src/context/AdminContext";
 import Login from "./Login";
-import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
+import Topbar from "./Topbar";
 import MobileAppBar from "./MobileAppBar";
 import MobileTabBar from "./MobileTabBar";
 import { SplashScreen } from "@healhub/ui/splash";
@@ -28,6 +28,19 @@ const AUTH_ROUTES = [
 const PanelShell = ({ children }) => {
   const { aToken } = useContext(AdminContext);
   const pathname = usePathname();
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("adminSidebarCollapsed");
+    setCollapsed(stored === "1");
+  }, []);
+
+  const toggle = () => {
+    setCollapsed((c) => {
+      localStorage.setItem("adminSidebarCollapsed", c ? "0" : "1");
+      return !c;
+    });
+  };
 
   if (!aToken) {
     const isAuthRoute = AUTH_ROUTES.includes(pathname);
@@ -43,25 +56,19 @@ const PanelShell = ({ children }) => {
   }
 
   return (
-    <>
-      <SplashScreen
-        title="Welcome to Healhub Admin"
-        subtitle="Manage doctors, hospitals, appointments and revenue from one place."
-      />
-      <div className="bg-background-base min-h-screen">
-        <div className="hidden md:block">
-          <Navbar />
-        </div>
+    <div className="min-h-screen bg-background-base">
+      <Sidebar collapsed={collapsed} onToggle={toggle} />
+      <div
+        className={`transition-all duration-300 ${
+          collapsed ? "lg:pl-[76px]" : "lg:pl-[264px]"
+        }`}
+      >
+        <Topbar />
         <MobileAppBar />
-        <div className="flex items-start">
-          <div className="hidden md:block">
-            <Sidebar />
-          </div>
-          <main className="flex-1 min-h-screen pb-[96px] md:pb-0">{children}</main>
-        </div>
+        <main className="mx-auto w-full max-w-[1560px]">{children}</main>
         <MobileTabBar />
       </div>
-    </>
+    </div>
   );
 };
 

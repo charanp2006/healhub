@@ -7,6 +7,7 @@ import axios from 'axios';
 import { BarChart, Bar, AreaChart, Area, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { TrendingUp, TrendingDown, Users, CalendarCheck, DollarSign, Building2, Award, CreditCard, Banknote } from 'lucide-react';
 import { SkeletonDashboard } from "@healhub/ui";
+import { PageContainer, PageHeader } from "@/src/components/ui";
 
 const COLORS = ['#20C3AE', '#6366F1', '#F59E0B', '#EF4444', '#3B82F6', '#8B5CF6', '#EC4899', '#10B981', '#F97316', '#06B6D4'];
 
@@ -66,14 +67,14 @@ const Analytics = () => {
   }
 
   return (
-    <div className="m-5 w-full max-w-6xl">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-xl font-bold text-text-primary">Analytics Dashboard</h1>
-          <p className="text-sm text-text-dim mt-0.5">Comprehensive insights into your healthcare platform</p>
-        </div>
-        <button onClick={fetchAll} className="px-4 py-2 text-sm border border-border rounded-lg hover:bg-background-muted cursor-pointer transition-colors">Refresh</button>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title="Analytics Dashboard"
+        subtitle="Comprehensive insights into your healthcare platform"
+        actions={
+          <button onClick={fetchAll} className="inline-flex items-center rounded-xl border border-border px-4 py-2 text-sm text-text-secondary transition-colors hover:bg-background-muted cursor-pointer">Refresh</button>
+        }
+      />
       <div className="flex gap-1 bg-background-muted p-1 rounded-lg mb-6 w-fit">
         {tabs.map(tab => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`px-4 py-2 text-sm rounded-md cursor-pointer transition-all ${activeTab === tab.key ? 'bg-background-card shadow-sm font-medium text-text-primary' : 'text-text-secondary hover:text-text-primary'}`}>{tab.label}</button>
@@ -303,7 +304,7 @@ const Analytics = () => {
           </div>
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 };
 

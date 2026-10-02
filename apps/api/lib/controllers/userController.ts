@@ -306,7 +306,7 @@ export async function getStats(request: Request): Promise<Response> {
     return json({ success: true, userCount, doctorCount, hospitalCount }, undefined, request);
   } catch (error) {
     console.log("Error in getStats:", error);
-    return json({ success: false, message: (error as Error).message }, undefined, request);
+    return json({ success: false, message: (error as Error).message }, 500, request);
   }
 }
 

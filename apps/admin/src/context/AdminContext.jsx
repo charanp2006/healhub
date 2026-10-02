@@ -2,7 +2,7 @@
 
 import { createContext, useState, useEffect } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "@/src/components/ui/Toast";
 import { backendURL } from "@/src/lib/api";
 
 export const AdminContext = createContext();

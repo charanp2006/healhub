@@ -7,3 +7,30 @@
 body {
   background-color: var(--s-bg-base);
 }
+
+/* Desktop thin scrollbars for the CMS panel */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--s-bg-muted-hover) transparent;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+::selection {
+  background: color-mix(in srgb, var(--primary) 25%, transparent);
+}
+
+.recharts-cartesian-grid line {
+  stroke: color-mix(in srgb, var(--s-border) 60%, transparent);
+}
+.recharts-tooltip-cursor {
+  fill: color-mix(in srgb, var(--primary) 8%, transparent);
+}

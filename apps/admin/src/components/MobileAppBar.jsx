@@ -2,12 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
-import { LogOut, ShieldCheck } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { LOGO, LOGO_ALT } from "@healhub/ui/images";
 import { ThemeToggle } from "@healhub/ui/theme";
 import { AdminContext } from "@/src/context/AdminContext";
 
-// Mobile-only sticky app bar. Desktop layout is untouched.
+// Mobile-only sticky app bar. Desktop layout uses Topbar.
 const MobileAppBar = () => {
   const router = useRouter();
   const { setAToken } = useContext(AdminContext);
@@ -20,7 +20,7 @@ const MobileAppBar = () => {
 
   return (
     <div className="mobile-app-bar md:hidden">
-      <div className="flex items-center justify-between px-4 h-14">
+      <div className="flex items-center justify-between border-b border-border bg-background-card/80 px-4 h-14 backdrop-blur-xl">
         <button
           onClick={() => router.push("/admin-dashboard")}
           className="flex items-center gap-2 touch-none-outline"
@@ -34,13 +34,9 @@ const MobileAppBar = () => {
 
         <div className="flex items-center gap-2">
           <ThemeToggle size={20} />
-          <span className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-primary-soft text-[#179E8D] font-medium">
-            <ShieldCheck size={13} />
-            Admin
-          </span>
           <button
             onClick={logout}
-            className="p-2 rounded-full bg-[#fdeeee] text-accent-cta touch-none-outline"
+            className="p-2 rounded-xl bg-[#ef4444]/10 text-[#ef4444] touch-none-outline"
             aria-label="Logout"
           >
             <LogOut size={19} />

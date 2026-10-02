@@ -1,7 +1,7 @@
 "use client";
 
-import { ToastContainer } from "react-toastify";
+import { ToastProvider } from "@/src/components/ui/Toast";
 
-export default function ToastWrapper() {
-  return <ToastContainer />;
+export default function ToastWrapper({ children }) {
+  return <ToastProvider>{children}</ToastProvider>;
 }

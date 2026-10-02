@@ -2,11 +2,12 @@
 "use client";
 import { useContext, useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "@/src/components/ui/Toast";
 import { AdminContext } from "@/src/context/AdminContext";
 import { AppContext } from "@/src/context/AppContext";
 import { Search, ChevronLeft, ChevronRight, Building2 } from "lucide-react";
 import { SkeletonList } from "@healhub/ui";
+import { PageContainer, PageHeader, Card, Badge } from "@/src/components/ui";
 
 const HospitalsMgmt = () => {
   const { backendURL, aToken } = useContext(AdminContext);
@@ -55,8 +56,12 @@ const HospitalsMgmt = () => {
   }, [search]);
 
   return (
-    <div className="w-full max-w-6xl m-5">
-      <p className="mb-3 text-lg font-medium">Hospitals (Reception Managed) <span className="text-sm text-text-secondary font-normal">({total})</span></p>
+    <PageContainer>
+      <PageHeader
+        title="Hospitals (Reception Managed)"
+        subtitle="Reception-managed hospital accounts"
+        actions={<Badge tone="primary" dot>{total} total</Badge>}
+      />
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <div className="relative">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-dim" />
@@ -68,8 +73,8 @@ const HospitalsMgmt = () => {
           <option value="unregistered">Unregistered</option>
         </select>
       </div>
-      <div className="bg-background-card border border-border rounded-lg text-sm max-h-[80vh] overflow-auto">
-        <div className="hidden sm:grid grid-cols-[0.5fr_1.5fr_0.8fr_0.8fr_0.8fr_1fr_1fr] gap-1 py-3 px-6 border-b border-border bg-background-muted font-medium text-text-secondary">
+      <Card padded={false} className="text-sm overflow-hidden">
+        <div className="hidden sm:grid grid-cols-[0.5fr_1.5fr_0.8fr_0.8fr_0.8fr_1fr_1fr] gap-1 py-3 px-6 border-b border-border bg-background-muted text-[11px] font-semibold uppercase tracking-wide text-text-secondary">
           <p>#</p><p>Hospital</p><p>City</p><p>Doctors</p><p>Appointments</p><p>Status</p><p>Billing Summary</p>
         </div>
         {loading ? (
@@ -92,9 +97,9 @@ const HospitalsMgmt = () => {
               <p className="text-text-secondary">{h.totalDoctors}</p>
               <p className="text-text-secondary">{h.totalAppointments}</p>
               <div>
-                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${h.isRegistered ? "bg-green-50 text-green-600" : "bg-red-50 text-red-500"}`}>
+                <Badge tone={h.isRegistered ? "emerald" : "rose"} dot>
                   {h.isRegistered ? "Registered" : "Unregistered"}
-                </span>
+                </Badge>
               </div>
               <div className="text-text-secondary">
                 <p className="text-xs">Revenue: <span className="font-medium text-text-primary">{currencySymbol}{h.totalRevenue?.toLocaleString() || "0"}</span></p>
@@ -102,7 +107,7 @@ const HospitalsMgmt = () => {
             </div>
           ))
         )}
-      </div>
+      </Card>
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-4 mt-4">
           <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)} className="flex items-center gap-1 px-3 py-1.5 text-sm border border-border rounded-full disabled:opacity-40 cursor-pointer hover:bg-primary-soft transition-colors">
@@ -114,7 +119,7 @@ const HospitalsMgmt = () => {
           </button>
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 };
 

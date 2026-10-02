@@ -3,9 +3,10 @@
 import { assets } from "@/src/assets/assets";
 import { useState, useEffect, useContext } from "react";
 import { AdminContext } from "@/src/context/AdminContext";
-import { toast } from "react-toastify";
+import { toast } from "@/src/components/ui/Toast";
 import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
+import { PageContainer, PageHeader, Card } from "@/src/components/ui";
 
 const AddDoctor = () => {
     const [docImg,setDocImg] = useState(false);
@@ -91,9 +92,18 @@ const AddDoctor = () => {
     }
 
   return (
-    <form onSubmit={onSubmitHandler} className="m-5 w-full">
-      <p className="m-b text-lg font-medium">Add Doctor</p>
-      <div className="bg-background-card px-8 py-8 rounded w-full max-w-4xl max-h-[80vh] overflow-y-scroll">
+    <PageContainer>
+      <form onSubmit={onSubmitHandler} className="w-full">
+        <PageHeader
+          title="Add Doctor"
+          subtitle="Register a new doctor and assign them to a hospital"
+          actions={
+            <button type="submit" className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-white shadow-sm shadow-primary/25 transition-all hover:bg-primary-hover cursor-pointer">
+              Add Doctor
+            </button>
+          }
+        />
+        <Card padded={false} className="w-full max-w-4xl p-8 overflow-y-auto">
         <div className="flex items-center gap-4 mb-8 text-text-secondary">
           <label htmlFor="doc-img">
             <img className="w-16 border-border rounded-full cursor-pointer" src={docImg ? URL.createObjectURL(docImg) : assets.upload_area} alt="" />
@@ -108,11 +118,11 @@ const AddDoctor = () => {
           <div className="w-full lg:flex-1 flex flex-col gap-4">
             <div className="flex-1 flex flex-col gap-1">
               <p>Doctor name</p>
-              <input onChange={(e)=> setName(e.target.value) } value={name} className="border rounded px-3 py-2" type="text" placeholder="Name" required />
+              <input onChange={(e)=> setName(e.target.value) } value={name} className="w-full border border-border bg-background-card rounded-xl px-3.5 py-2.5 text-sm text-text-primary outline-none transition-colors placeholder:text-text-dim focus:border-primary focus:ring-2 focus:ring-primary/15" type="text" placeholder="Name" required />
             </div>
             <div className="flex-1 flex flex-col gap-1">
               <p>Doctor Email</p>
-              <input onChange={(e)=> setEmail(e.target.value) } value={email} className="border rounded px-3 py-2" type="email" placeholder="Email" required />
+              <input onChange={(e)=> setEmail(e.target.value) } value={email} className="w-full border border-border bg-background-card rounded-xl px-3.5 py-2.5 text-sm text-text-primary outline-none transition-colors placeholder:text-text-dim focus:border-primary focus:ring-2 focus:ring-primary/15" type="email" placeholder="Email" required />
             </div>
             <div className="flex-1 flex flex-col gap-1 relative">
               <p>Doctor password</p>
@@ -123,7 +133,7 @@ const AddDoctor = () => {
             </div>
             <div className="flex-1 flex flex-col gap-1">
               <p>Experience</p>
-              <select onChange={(e)=> setExperience(e.target.value) } value={experience} className="border rounded px-3 py-2" name="" id="experience">
+              <select onChange={(e)=> setExperience(e.target.value) } value={experience} className="w-full border border-border bg-background-card rounded-xl px-3.5 py-2.5 text-sm text-text-primary outline-none transition-colors placeholder:text-text-dim focus:border-primary focus:ring-2 focus:ring-primary/15" name="" id="experience">
                 <option value="">*select</option>
                 <option value="1 Year">1 Year</option>
                 <option value="2 Year">2 Year</option>
@@ -139,13 +149,13 @@ const AddDoctor = () => {
             </div>
             <div className="flex-1 flex flex-col gap-1">
               <p>Fees</p>
-              <input onChange={(e)=> setFees(e.target.value) } value={fees} className="border rounded px-3 py-2" type="number" placeholder="fees" required />
+              <input onChange={(e)=> setFees(e.target.value) } value={fees} className="w-full border border-border bg-background-card rounded-xl px-3.5 py-2.5 text-sm text-text-primary outline-none transition-colors placeholder:text-text-dim focus:border-primary focus:ring-2 focus:ring-primary/15" type="number" placeholder="fees" required />
             </div>
           </div>
           <div className="w-full lg:flex-1 flex flex-col gap-4">
             <div className="flex-1 flex flex-col gap-1">
               <p>Select Hospital / Clinic</p>
-              <select onChange={(e)=> setHospitalId(e.target.value) } value={hospitalId} className="border rounded px-3 py-2" required>
+              <select onChange={(e)=> setHospitalId(e.target.value) } value={hospitalId} className="w-full border border-border bg-background-card rounded-xl px-3.5 py-2.5 text-sm text-text-primary outline-none transition-colors placeholder:text-text-dim focus:border-primary focus:ring-2 focus:ring-primary/15" required>
                 <option value="">*select</option>
                 {registeredHospitals.map((hospital) => (
                   <option key={hospital._id} value={hospital._id}>{hospital.name} — {hospital.city}</option>
@@ -154,7 +164,7 @@ const AddDoctor = () => {
             </div>
             <div className="flex-1 flex flex-col gap-1">
               <p>Speciality</p>
-              <select onChange={(e)=> setSpeciality(e.target.value) } value={Speciality} className="border rounded px-3 py-2" name="" id="speciality">
+              <select onChange={(e)=> setSpeciality(e.target.value) } value={Speciality} className="w-full border border-border bg-background-card rounded-xl px-3.5 py-2.5 text-sm text-text-primary outline-none transition-colors placeholder:text-text-dim focus:border-primary focus:ring-2 focus:ring-primary/15" name="" id="speciality">
                 <option >*select</option>
                 <option value="General Physician">General Physician</option>
                 <option value="Gynecologist">Gynecologist</option>
@@ -166,22 +176,22 @@ const AddDoctor = () => {
             </div>
             <div className="flex-1 flex flex-col gap-1">
               <p>Education</p>
-              <input onChange={(e)=> setDegree(e.target.value) } value={degree} className="border rounded px-3 py-2" type="text" placeholder="Education" required />
+              <input onChange={(e)=> setDegree(e.target.value) } value={degree} className="w-full border border-border bg-background-card rounded-xl px-3.5 py-2.5 text-sm text-text-primary outline-none transition-colors placeholder:text-text-dim focus:border-primary focus:ring-2 focus:ring-primary/15" type="text" placeholder="Education" required />
             </div>
             <div className="flex-1 flex flex-col gap-1">
               <p>Address</p>
-              <input onChange={(e)=> setAddress1(e.target.value) } value={address1} className="border rounded px-3 py-2" type="text" placeholder="Address 1" required />
-              <input onChange={(e)=> setAddress2(e.target.value) } value={address2} className="border rounded px-3 py-2" type="text" placeholder="Address 2" required />
+              <input onChange={(e)=> setAddress1(e.target.value) } value={address1} className="w-full border border-border bg-background-card rounded-xl px-3.5 py-2.5 text-sm text-text-primary outline-none transition-colors placeholder:text-text-dim focus:border-primary focus:ring-2 focus:ring-primary/15" type="text" placeholder="Address 1" required />
+              <input onChange={(e)=> setAddress2(e.target.value) } value={address2} className="w-full border border-border bg-background-card rounded-xl px-3.5 py-2.5 text-sm text-text-primary outline-none transition-colors placeholder:text-text-dim focus:border-primary focus:ring-2 focus:ring-primary/15" type="text" placeholder="Address 2" required />
             </div>
           </div>
         </div>
-        <div className="text-text-secondary">
-          <p className="mt-4 mb-2">Adout Doctor</p>
-          <textarea onChange={(e)=> setAbout(e.target.value) } value={about} className="w-full px-4 pt-2 border rounded" placeholder="Write about doctor" rows={5} required />
+        <div className="mt-6">
+          <p className="mb-2 text-sm font-medium text-text-secondary">About Doctor</p>
+          <textarea onChange={(e)=> setAbout(e.target.value) } value={about} className="w-full rounded-xl border border-border bg-background-card px-4 py-3 text-sm text-text-primary outline-none transition-colors placeholder:text-text-dim focus:border-primary focus:ring-2 focus:ring-primary/15" placeholder="Write about doctor" rows={5} required />
         </div>
-        <button type="submit" className="bg-primary mt-4 px-10 py-3 text-white rounded-full cursor-pointer">Add doctor</button>
-      </div>
-    </form>
+        </Card>
+      </form>
+    </PageContainer>
   );
 };
 

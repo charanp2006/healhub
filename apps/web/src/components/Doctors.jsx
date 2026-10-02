@@ -3,7 +3,13 @@
 import { useContext, useEffect, useState } from "react";
 import { useRouter, useParams, usePathname } from "next/navigation";
 import { AppContext } from "@/src/context/AppContext";
-import { Star, SlidersHorizontal, X } from "lucide-react";
+import {
+  ArrowRight,
+  SlidersHorizontal,
+  Star,
+  Stethoscope,
+  X,
+} from "lucide-react";
 
 const Doctors = () => {
   const { speciality } = useParams();
@@ -14,6 +20,12 @@ const Doctors = () => {
   const router = useRouter();
 
   const { doctors } = useContext(AppContext);
+
+  const normalizedSpeciality = speciality
+    ? decodeURIComponent(speciality)
+    : null;
+  const isActiveRoute = (route) =>
+    normalizedSpeciality === route.split("/").pop();
 
   const specialities = [
     { key: "General physician", route: "/doctors/General physician" },
@@ -35,9 +47,10 @@ const Doctors = () => {
       filtered = filtered.filter((doc) => doc.hospitalId === hospitalId);
     }
 
-    if (speciality) {
+    if (normalizedSpeciality) {
       filtered = filtered.filter(
-        (doc) => doc.speciality.toLowerCase() === speciality.toLowerCase()
+        (doc) =>
+          doc.speciality.toLowerCase() === normalizedSpeciality.toLowerCase()
       );
     }
 
@@ -56,7 +69,7 @@ const Doctors = () => {
     );
     const hospitalId = params.get("hospitalId");
     router.push(
-      speciality === specialityKey
+      isActiveRoute(route)
         ? hospitalId
           ? `/doctors?hospitalId=${hospitalId}`
           : "/doctors"
@@ -66,109 +79,215 @@ const Doctors = () => {
     );
   };
 
-  const specialityPill = (s) => (
-    <p
-      key={s.key}
-      onClick={() => pickSpeciality(s.key, s.route)}
-      className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-border rounded transition-all cursor-pointer ${
-        speciality === s.key ? "bg-primary-soft text-text-primary " : ""
-      }`}
-    >
-      {s.key}
-    </p>
-  );
+  const displayTitle = normalizedSpeciality
+    ? normalizedSpeciality.replace(/\b\w/g, (c) => c.toUpperCase())
+    : "Doctor";
 
   return (
     <div>
-      <p className="text-text-secondary">
-        Browse through the doctors specialist.
-      </p>
-      <div className="flex flex-col sm:flex-row items-start gap-5 mt-5">
+      {/* ---------- Header ---------- */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <span className="inline-flex items-center gap-2 rounded-full border border-primary-soft bg-primary-soft/30 px-3.5 py-1 text-xs font-semibold uppercase tracking-widest text-primary">
+            Book a Specialist
+          </span>
+          <h1 className="mt-4 text-3xl font-bold tracking-tight text-text-primary md:text-4xl">
+            {speciality ? (
+              <>
+                {displayTitle}{" "}
+                <span className="bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
+                  Doctors
+                </span>
+              </>
+            ) : (
+              <>
+                Find Your{" "}
+                <span className="bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
+                  Doctor
+                </span>
+              </>
+            )}
+          </h1>
+          <p className="mt-2 text-sm leading-relaxed text-text-secondary md:text-base">
+            {filterDoc.length} verified doctor{filterDoc.length === 1 ? "" : "s"}
+            {speciality ? ` in ${displayTitle}` : " across all specialities"}.
+          </p>
+        </div>
         <button
-          className={`py-1 px-3 rounded-full md:hidden flex items-center gap-2 text-sm transition-all ${showFilter ? "bg-primary text-white" : "bg-background-card border border-border shadow-sm"}`}
+          className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-all lg:hidden ${
+            showFilter
+              ? "bg-primary text-white"
+              : "border border-border bg-background-card text-text-primary shadow-sm"
+          }`}
           onClick={() => setShowFilter((prev) => !prev)}
         >
           <SlidersHorizontal size={15} />
           Filters
         </button>
+      </div>
 
-        {/* ---------- Desktop filter sidebar (unchanged) ---------- */}
-        <div className="hidden sm:flex flex-col gap-4 text-sm text-text-secondary">
-          {specialities.map((s) => specialityPill(s))}
-        </div>
-
-        <div className="w-full grid grid-cols-2 md:grid-cols-auto gap-3 md:gap-4 gap-y-5 md:gap-y-6">
-          {filterDoc.map((item, index) => (
-            <div
-              onClick={() => router.push(`/appointment/${item._id}`)}
-              key={index}
-              className="border border-primary-soft bg-background-card rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500"
+      <div className="mt-8 flex flex-col items-start gap-6 lg:flex-row">
+        {/* ---------- Desktop filter sidebar ---------- */}
+        <aside className="hidden w-64 flex-shrink-0 flex-col rounded-3xl border border-border bg-background-card p-5 lg:flex">
+          <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-text-dim">
+            Specialities
+          </p>
+          <div className="flex flex-col gap-2">
+            <button
+              onClick={() => pickSpeciality(null, "/doctors")}
+              className={`rounded-xl px-4 py-2.5 text-left text-sm font-medium transition-all ${
+                !normalizedSpeciality
+                  ? "bg-primary text-white shadow-lg shadow-primary/25"
+                  : "text-text-secondary hover:bg-background-muted hover:text-text-primary"
+              }`}
             >
-              <img className="bg-primary-soft w-full" src={item.image} alt="" />
-              <div className="p-3 md:p-4">
-                <div
-                  className={`flex items-center gap-2 text-xs md:text-sm text-center ${item.available ? "text-green-600" : "text-text-secondary"} `}
-                >
-                  <span
-                    className={`w-2 h-2 ${item.available ? "bg-green-500" : "bg-background-muted-hover"} rounded-full`}
-                  ></span>
-                  <p>{item.available ? "Available" : "Not Available"}</p>
-                </div>
-                <p className="text-text-primary text-sm md:text-lg font-medium">
-                  {item.name}
-                </p>
-                <p className="text-text-secondary text-xs md:text-sm truncate">
-                  {item.speciality}
-                </p>
-                <div className="flex items-center gap-1 mt-2">
-                  <Star
-                    size={16}
-                    className="fill-yellow-400 text-yellow-400"
-                  />
-                  <span className="text-sm font-medium text-text-primary">
-                    {item.ratingAverage
-                      ? item.ratingAverage.toFixed(1)
-                      : "0.0"}
-                  </span>
-                  <span className="text-xs text-text-secondary">
-                    ({item.ratingCount || 0})
-                  </span>
-                </div>
-              </div>
+              All Doctors
+            </button>
+            {specialities.map((s) => (
+              <button
+                key={s.key}
+                onClick={() => pickSpeciality(s.key, s.route)}
+                className={`rounded-xl px-4 py-2.5 text-left text-sm font-medium transition-all ${
+                  isActiveRoute(s.route)
+                    ? "bg-primary text-white shadow-lg shadow-primary/25"
+                    : "text-text-secondary hover:bg-background-muted hover:text-text-primary"
+                }`}
+              >
+                {s.key}
+              </button>
+            ))}
+          </div>
+        </aside>
+
+        {/* ---------- Doctor cards ---------- */}
+        <div className="w-full flex-1">
+          {filterDoc.length === 0 ? (
+            <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-border bg-background-card p-16 text-center">
+              <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-soft text-primary">
+                <Stethoscope size={26} />
+              </span>
+              <p className="mt-4 text-lg font-semibold text-text-primary">
+                No doctors found
+              </p>
+              <p className="mt-1 text-sm text-text-secondary">
+                Try a different speciality or clear the filter.
+              </p>
+              <button
+                onClick={() => router.push("/doctors")}
+                className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:bg-primary-hover active:scale-95"
+              >
+                View all doctors
+              </button>
             </div>
-          ))}
+          ) : (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              {filterDoc.map((item, index) => (
+                <div
+                  onClick={() => router.push(`/appointment/${item._id}`)}
+                  key={index}
+                  className="group flex cursor-pointer flex-col overflow-hidden rounded-3xl border border-border bg-background-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl"
+                >
+                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-primary-soft">
+                    <img
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      src={item.image}
+                      alt={item.name}
+                    />
+                    <span
+                      className={`absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold backdrop-blur ${
+                        item.available
+                          ? "bg-green-500/90 text-white"
+                          : "bg-background-card/90 text-text-secondary"
+                      }`}
+                    >
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full ${
+                          item.available ? "bg-white" : "bg-text-dim"
+                        }`}
+                      />
+                      {item.available ? "Available" : "Not Available"}
+                    </span>
+                  </div>
+                  <div className="flex flex-1 flex-col gap-2 p-5">
+                    <p className="text-lg font-semibold text-text-primary">
+                      {item.name}
+                    </p>
+                    <span className="w-fit rounded-full bg-primary-soft px-3 py-1 text-xs font-medium text-primary">
+                      {item.speciality}
+                    </span>
+                    <div className="mt-1 flex items-center gap-1.5">
+                      <Star
+                        size={16}
+                        className="fill-yellow-400 text-yellow-400"
+                      />
+                      <span className="text-sm font-semibold text-text-primary">
+                        {item.ratingAverage
+                          ? item.ratingAverage.toFixed(1)
+                          : "New"}
+                      </span>
+                      <span className="text-xs text-text-secondary">
+                        ({item.ratingCount || 0} reviews)
+                      </span>
+                    </div>
+                    <div className="mt-auto flex items-center justify-between border-t border-border pt-3">
+                      <span className="text-xs text-text-secondary">
+                        {item.available ? "Slots available" : "Check later"}
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary">
+                        Book
+                        <ArrowRight
+                          size={14}
+                          className="transition-transform group-hover:translate-x-1"
+                        />
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
       {/* ---------- Mobile filter bottom sheet ---------- */}
       <div
-        className={`fixed inset-0 z-50 md:hidden ${showFilter ? "" : "hidden"}`}
+        className={`fixed inset-0 z-50 lg:hidden ${showFilter ? "" : "hidden"}`}
       >
         <div
           className="absolute inset-0 bg-black/40"
           onClick={() => setShowFilter(false)}
         />
-        <div className="absolute inset-x-0 bottom-0 bg-background-card rounded-t-3xl p-5 pb-10">
-          <div className="flex items-center justify-between mb-4">
+        <div className="absolute inset-x-0 bottom-0 rounded-t-3xl border-t border-border bg-background-card p-5 pb-[calc(84px+env(safe-area-inset-bottom,0px))]">
+          <div className="mb-4 flex items-center justify-between">
             <p className="text-lg font-semibold text-text-primary">
               Filter by Speciality
             </p>
             <button
               onClick={() => setShowFilter(false)}
-              className="p-2 rounded-full bg-background-base touch-none-outline"
+              className="rounded-full bg-background-base p-2 text-text-secondary touch-none-outline"
             >
               <X size={20} />
             </button>
           </div>
           <div className="grid grid-cols-2 gap-3">
+            <p
+              onClick={() => pickSpeciality(null, "/doctors")}
+              className={`rounded-full border px-3 py-2.5 text-center text-xs transition-all ${
+                !normalizedSpeciality
+                  ? "border-primary bg-primary text-white"
+                  : "border-border bg-background-card text-text-secondary"
+              }`}
+            >
+              All Doctors
+            </p>
             {specialities.map((s) => (
               <p
                 key={s.key}
                 onClick={() => pickSpeciality(s.key, s.route)}
-                className={`text-xs px-3 py-2.5 rounded-full border text-center transition-all ${
-                  speciality === s.key
-                    ? "bg-primary text-white border-primary"
-                    : "border-border text-text-secondary bg-background-card"
+                className={`rounded-full border px-3 py-2.5 text-center text-xs transition-all ${
+                  isActiveRoute(s.route)
+                    ? "border-primary bg-primary text-white"
+                    : "border-border bg-background-card text-text-secondary"
                 }`}
               >
                 {s.key}
@@ -177,9 +296,10 @@ const Doctors = () => {
           </div>
           <button
             onClick={() => setShowFilter(false)}
-            className="w-full mt-6 bg-background-base border border-border rounded-xl py-3 text-sm font-medium text-text-secondary touch-none-outline"
+            className="mt-6 w-full rounded-full bg-primary py-3 text-sm font-semibold text-white shadow-lg shadow-primary/25 touch-none-outline"
           >
-            Show {filterDoc.length} doctor{filterDoc.length === 1 ? "" : "s"}
+            Show {filterDoc.length} doctor
+            {filterDoc.length === 1 ? "" : "s"}
           </button>
         </div>
       </div>
