@@ -71,11 +71,15 @@ async function resolveMongoURI(): Promise<string> {
 const cached: { conn: typeof mongoose | null; promise: Promise<typeof mongoose> | null } =
   globalThis.mongooseGlobal ?? (globalThis.mongooseGlobal = { conn: null, promise: null });
 
+const resetCache = () => {
+  cached.conn = null;
+  cached.promise = null;
+};
+
 // Fail fast instead of queueing operations on a stale/dropped socket for 10s
 // (the default `bufferCommands` behavior), which made the API feel dead while
 // the Atlas connection was recovering.
 mongoose.set("bufferCommands", false);
-mongoose.set("bufferTimeoutMS", 0);
 
 const MONGO_OPTIONS: mongoose.ConnectOptions = {
   serverSelectionTimeoutMS: 8000,
@@ -94,37 +98,39 @@ export async function connectDB(): Promise<typeof mongoose> {
     return cached.conn;
   }
 
-  // Connection is missing, mid-connect, or has dropped — ensure we reconnect
-  // instead of handing out a stale instance whose operations will buffer/time out.
-  cached.conn = null;
+  // Single-flight: concurrent requests share one connect attempt instead of
+  // opening competing sockets.
   if (!cached.promise) {
-    const uri = resolvedURI ?? (resolvedURI = await resolveMongoURI());
-    cached.promise = mongoose.connect(uri, MONGO_OPTIONS).then(() => mongoose);
-  }
-
-  try {
-    cached.conn = await cached.promise;
-  } catch (e) {
-    cached.promise = null;
-    throw e;
-  }
-
-  if (mongoose.connection.readyState !== 1) {
     cached.conn = null;
-    cached.promise = null;
-    return connectDB();
+    const attempt: Promise<typeof mongoose> = (async () => {
+      const uri = resolvedURI ?? (resolvedURI = await resolveMongoURI());
+      await mongoose.connect(uri, MONGO_OPTIONS);
+      return mongoose;
+    })();
+    cached.promise = attempt;
+
+    // Never cache a failed attempt — the next request starts a fresh one.
+    void attempt.catch(() => {
+      if (cached.promise === attempt) {
+        resetCache();
+      }
+    });
   }
 
-  return cached.conn;
+  const conn = await cached.promise;
+
+  // Resolved without an open connection (socket dropped mid-handshake): drop the
+  // cache and fail this request instead of recursing into another attempt.
+  if (mongoose.connection.readyState !== 1) {
+    resetCache();
+    throw new Error("MongoDB connection is not ready");
+  }
+
+  cached.conn = conn;
+  return conn;
 }
 
-const resetCache = () => {
-  cached.conn = null;
-  cached.promise = null;
-};
-
 mongoose.connection.on("disconnected", resetCache);
-mongoose.connection.on("reconnected", () => {});
 mongoose.connection.on("error", (err) => {
   console.error("MongoDB connection error:", err);
 });
