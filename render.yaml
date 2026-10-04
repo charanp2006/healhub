@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: healhub-api
+    runtime: node
+    plan: free
+    region: singapore
+    rootDir: .
+    buildCommand: npm ci && npm run build --workspace apps/api
+    startCommand: npm run start --workspace apps/api
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: AUTH_SECRET
+        sync: false
+      - key: AUTH_TRUST_HOST
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PW
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: CURRENCY
+        sync: false
+      - key: CLOUDINARY_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_SECRET_KEY
+        sync: false
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false

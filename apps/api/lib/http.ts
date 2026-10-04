@@ -53,7 +53,7 @@ export function json(
   });
 }
 
-export function handleOptions(request?: Request): Response {
+export function handleOptions(request: Request): Response {
   return new Response(null, {
     status: 204,
     headers: corsHeaders(request),
