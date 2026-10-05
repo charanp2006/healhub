@@ -16,20 +16,24 @@ const DoctorAvailability = () => {
   const [copiedDay, setCopiedDay] = useState(null);
   const [activePreset, setActivePreset] = useState(null);
 
+  // Grid granularity follows the doctor's own slotDuration so the times shown
+  // here are exactly the times the booking engine will hand out.
+  const slotDuration = Number(profileData?.slotDuration) > 0 ? Number(profileData.slotDuration) : 30;
+
   const toMinutes = (t) => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
   const toTime = (mins) => { const h = Math.floor(mins / 60); const m = mins % 60; return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`; };
 
   const slotsBetween = (start, end) => {
     if (!start || !end) return [];
     const slots = [];
-    for (let t = toMinutes(start); t < toMinutes(end); t += 30) slots.push(toTime(t));
+    for (let t = toMinutes(start); t < toMinutes(end); t += slotDuration) slots.push(toTime(t));
     return slots;
   };
 
   const collapseSlots = (slots) => {
     if (!slots || slots.length === 0) return { enabled: false, startTime: "09:00", endTime: "09:00" };
     const sorted = [...slots].sort();
-    return { enabled: true, startTime: sorted[0], endTime: toTime(toMinutes(sorted[sorted.length - 1]) + 30) };
+    return { enabled: true, startTime: sorted[0], endTime: toTime(toMinutes(sorted[sorted.length - 1]) + slotDuration) };
   };
 
   const timeSlots = {

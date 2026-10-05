@@ -53,6 +53,7 @@ export const apiEndpoints: ApiEndpoint[] = [
   { path: "/api/blog/post/:slug", methods: ["GET"] },
   { path: "/api/blog/update", methods: ["POST"] },
   { path: "/api/doctor/:docId/schedule", methods: ["GET"] },
+  { path: "/api/doctor/:docId/availability", methods: ["GET"] },
   { path: "/api/doctor/add-prescription", methods: ["POST"] },
   { path: "/api/doctor/analytics", methods: ["GET"] },
   { path: "/api/doctor/appointments", methods: ["GET"] },

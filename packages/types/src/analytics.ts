@@ -17,8 +17,6 @@ export interface OverviewStats {
   totalRevenue: number;
   thisMonthRevenue: number;
   revenueGrowth: number;
-  videoCount: number;
-  inPersonCount: number;
 }
 
 export interface TrendPoint {

@@ -10,11 +10,6 @@ const appointmentSchema = new mongoose.Schema({
   docData: { type: Object, required: true },
   amount: { type: Number, required: true },
   date: { type: Number, required: true },
-  appointmentType: {
-    type: String,
-    enum: ["in-person", "video"],
-    default: "in-person",
-  },
   symptoms: { type: String, default: "" },
   notes: { type: String, default: "" },
   prescription: { type: String, default: "" },

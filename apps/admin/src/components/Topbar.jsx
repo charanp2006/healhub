@@ -43,7 +43,7 @@ const DUMMY_NOTIFICATIONS = [
   {
     id: 1,
     title: "New appointment booked",
-    desc: "Priya Sharma booked a video consult with Dr. Mehta.",
+    desc: "Priya Sharma booked an appointment with Dr. Mehta.",
     time: "2 min ago",
     Icon: CalendarDays,
     tone: "blue",

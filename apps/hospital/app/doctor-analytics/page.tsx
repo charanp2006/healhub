@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { DoctorContext } from '@/src/context/DoctorContext';
 import { AppContext } from '@/src/context/AppContext';
 import axios from 'axios';
-import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { TrendingUp, TrendingDown, CalendarCheck, Users, CircleDollarSign, CalendarMinus } from 'lucide-react';
 import { SkeletonDashboard } from "@healhub/ui";
 
@@ -30,8 +30,6 @@ const DoctorAnalytics = () => {
             revenueGrowth: a.revenue?.revenueGrowth,
             cancelledCount: a.stats?.cancelledAppointments,
             activeCount: a.stats?.activeAppointments,
-            inPersonCount: a.breakdown?.inPersonCount,
-            videoCount: a.breakdown?.videoCount,
           });
           setTrends((a.monthlyTrend || []).map((m) => ({
             month: m.month,
@@ -101,21 +99,7 @@ const DoctorAnalytics = () => {
           </ResponsiveContainer>
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="bg-background-card rounded-xl border border-border p-5 shadow-sm">
-          <p className="font-semibold text-text-primary mb-4">Appointment Types</p>
-          <div className="flex items-center justify-center h-48">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie data={[{ name: 'In-Person', value: overview.inPersonCount || 0 }, { name: 'Video', value: overview.videoCount || 0 }]} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value">
-                  <Cell fill="#20C3AE" /><Cell fill="#6366F1" />
-                </Pie>
-                <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid #E5E7EB', fontSize: '12px' }} />
-                <Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+      <div className="grid grid-cols-1 gap-4">
         <div className="bg-background-card rounded-xl border border-border p-5 shadow-sm">
           <p className="font-semibold text-text-primary mb-4">Performance Summary</p>
           <div className="space-y-3">
@@ -130,10 +114,6 @@ const DoctorAnalytics = () => {
             <div className="flex items-center justify-between p-3 bg-background-muted rounded-lg">
               <span className="text-sm text-text-secondary">Active Bookings</span>
               <span className="font-semibold text-text-primary">{overview.activeCount || 0}</span>
-            </div>
-            <div className="flex items-center justify-between p-3 bg-background-muted rounded-lg">
-              <span className="text-sm text-text-secondary">Video Consultations</span>
-              <span className="font-semibold text-text-primary">{overview.videoCount || 0}</span>
             </div>
           </div>
         </div>

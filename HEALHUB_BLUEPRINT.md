@@ -113,7 +113,7 @@ Four distinct actor groups are implemented:
 
 ## Major Supported Workflows
 
-- Patient registration & login; profile management; doctor/hospital discovery; appointment booking (in-person/video); appointment reschedule/cancel; rating/review; prescription viewing.
+- Patient registration & login; profile management; doctor/hospital discovery; appointment booking (in-person); appointment reschedule/cancel; rating/review; prescription viewing.
 - Doctor login; appointment completion; prescription writing; schedule & blocked-date management; analytics & revenue view.
 - Hospital login; doctor onboarding; room/bed category management; patient admission/discharge; analytics; blogs.
 - Admin login; doctor/hospital onboarding; appointment oversight; room/bed management; content moderation; analytics; dashboard.
@@ -170,7 +170,7 @@ Actual product capabilities as evidenced in the codebase.
 | Doctor discovery | List/search doctors | [IMPLEMENTED] | `doctorController.doctorList`, `GET /api/doctor/list` |
 | Hospital discovery | List/search hospitals w/ geo-filter | [IMPLEMENTED] | `hospitalController.listHospitals` |
 | Hospital profile | Hospital + its doctors + room availability | [IMPLEMENTED] | `getHospitalProfile`, `getPublicRoomAvailability` |
-| Appointment booking | Book in-person/video slot | [IMPLEMENTED] | `bookAppointment`, `POST /api/user/book-appointment` |
+| Appointment booking | Book in-person slot | [IMPLEMENTED] | `bookAppointment`, `POST /api/user/book-appointment` |
 | Appointment reschedule | Change date/time | [IMPLEMENTED] | `rescheduleAppointment` |
 | Appointment cancel | Cancel (user/admin/doctor) | [IMPLEMENTED] | `cancelUserAppointment`, `appointmentCancel`, `cancelDoctorAppointment` |
 | Appointment completion | Mark completed + prescription | [IMPLEMENTED] | `completeDoctorAppointment`, `addPrescription` |
@@ -387,7 +387,7 @@ Each module is documented from business + technical perspectives (per Section 67
 # 10. Intelligence / Automation Assessment
 
 - **AI/ML, recommendation engine, telemedicine AI, chatbots:** [MISSING] / [FUTURE]. No ML or inference code exists.
-- **"Video consultation"** appointment type exists as a **data field and UI toggle only**; there is **no video-call implementation** (no WebRTC/third-party). *Request logs would be needed to confirm; the current UI simply records the type.*
+- **Appointment type:** appointments are **in-person only**; the former "video consultation" type field and its UI toggles have been **removed** end-to-end (schema, API, types, analytics, admin, hospital).
 - **Auto-generated doctor recommendations:** [FUTURE]. Only related-doctor/related-blog display logic exists.
 
 ---
@@ -663,7 +663,6 @@ erDiagram
         object docData
         number amount
         number date
-        string appointmentType
         string prescription
         string followUpDate
         boolean cancelled
@@ -854,7 +853,7 @@ See Executive Summary (Section 1), Product Overview (Section 2), Core Modules (S
 - **Phase 2 — Scalability/Security:** Aggregations, indexes, rate limiting, Helmet, audits, backups, tests + CI.
 - **Phase 3 — Advanced Hospital Operations:** IPD clinical documentation, OPD queue.
 - **Phase 4 — Analytics/Optimization:** Recommendation engine, predictive analytics, export/reporting.
-- **Phase 5 — Future Expansion:** Telemedicine (real video), AI symptom analysis, insurance/EHR integration, mobile apps, multi-language.
+- **Phase 5 — Future Expansion:** Telemedicine, AI symptom analysis, insurance/EHR integration, mobile apps, multi-language.
 
 ---
 
@@ -902,7 +901,7 @@ With security hardening, notifications, and operational module completion, Healh
 | FEAT-011 | Discovery | List doctors | speciality-filter client-side | [IMPLEMENTED] | High | `doctorList` |
 | FEAT-012 | Discovery | List hospitals | geo/filter/sort/paginate | [IMPLEMENTED] | High | `listHospitals` |
 | FEAT-013 | Discovery | Hospital profile + doctors + rooms | aggregate view | [IMPLEMENTED] | High | `getHospitalProfile` |
-| FEAT-014 | Booking | Book appointment | in-person/video, symptoms/notes | [IMPLEMENTED] | Critical | `bookAppointment` |
+| FEAT-014 | Booking | Book appointment | in-person, symptoms/notes | [IMPLEMENTED] | Critical | `bookAppointment` |
 | FEAT-015 | Scheduling | Doctor weekly schedule | enable/start/end per day | [IMPLEMENTED] | High | `updateDoctorSchedule` |
 | FEAT-016 | Scheduling | Blocked dates | vacation/leave | [IMPLEMENTED] | High | `addBlockedDates` |
 | FEAT-017 | Appointment | List user appointments | — | [IMPLEMENTED] | High | `getUserAppointments` |
@@ -1023,7 +1022,7 @@ Selected formal requirements (testable) — representative set; each is `[IMPLEM
 | INT-001 | Cloudinary | Image storage | Outbound | name/key/secret | image → secure_url | [IMPLEMENTED] | No limits/cleanup |
 | INT-002 | MongoDB | Persistence | Local | URI | all entities | [IMPLEMENTED] | URI path append |
 | INT-003 | (Proposed) Email/SMS | Notifications | Outbound | — | — | [MISSING] | — |
-| INT-004 | (Future) Video | Teleconsult | — | — | — | [FUTURE] | — |
+| INT-004 | (Future) Telemedicine | Teleconsult provider | — | — | — | [FUTURE] | — |
 
 ## Appendix I — Business Rules
 
@@ -1164,7 +1163,6 @@ Selected fields across entities (meaning + constraints). (Representative; full s
 | slotDate/slotTime | appointment | String | yes | — | Slot |
 | userData/docData | appointment | Object | yes | snapshot | Denormalized |
 | amount | appointment | Number | yes | — | Fee |
-| appointmentType | appointment | String | no | in-person|video | Type |
 | prescription/followUpDate | appointment | String | no | — | Clinical |
 | cancelled/isCompleted/rescheduled | appointment | Boolean | no | — | State |
 | rating/review | appointment | Number/String | no | 1..5 | Feedback |
@@ -1187,7 +1185,6 @@ Selected fields across entities (meaning + constraints). (Representative; full s
 | KPI-007 | Revenue Growth | month-over-month % | analytics | Current | Implemented |
 | KPI-008 | Appointment Growth | month-over-month % | analytics | Current | Implemented |
 | KPI-009 | Completion Rate | completed/total % | analytics | Current | Implemented |
-| KPI-010 | In-person vs Video | appointmentType counts | analytics | Current | Implemented |
 | KPI-011 | Bed Occupancy / availability | total/availableBeds | hospital | Current | Implemented |
 | KPI-012 | Doctor/Hospital Rating | average rating | doctor/hospital | Current | Implemented |
 | KPI-013 | Blog Views | blog.views | public | Current | Implemented |
@@ -1233,7 +1230,7 @@ Selected fields across entities (meaning + constraints). (Representative; full s
 | DEC-01 | Real-time vs manual availability | Server-driven via slots_booked | Add atomic reservation | Improve race safety | Backend |
 | DEC-02 | Structured prescriptions | Free-text | Structured meds model | Phase 1 | Clinical |
 | DEC-03 | Bed-admission patient requirement | Requires existing user ID | Allow walk-in patient reg | Decide | Hospital |
-| DEC-04 | Video consultations | Type field only | Real video (WebRTC/3P) | Future | Product |
+| DEC-04 | Video consultations | Removed — in-person only | Reintroduce as a future capability | Deferred | Product |
 | DEC-05 | Notifications provider | None | Email/SMS vendor | Phase 1 | Product |
 | DEC-06 | Token storage | localStorage | httpOnly cookie | Adopt | Security |
 | DEC-07 | Compliance target | None | DPDP/GDPR mapping | Plan | Legal |

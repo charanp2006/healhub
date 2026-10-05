@@ -8,6 +8,7 @@ import { connectDB } from "../db";
 import { uploadImageToCloudinary } from "../upload";
 import { json, bad, tooMany } from "../http";
 import { verifyUser, signAuthToken } from "../auth";
+import { validateSlot } from "../availability";
 import {
   clientIp,
   checkLoginRateGate,
@@ -163,23 +164,38 @@ export async function bookAppointment(request: Request): Promise<Response> {
     if (!auth.ok) return bad(auth.message, request);
     const userId = auth.userId;
 
-    const { docId, slotDate, slotTime, appointmentType, symptoms, notes } =
-      await request.json();
+    const { docId, slotDate, slotTime, symptoms, notes } = await request.json();
 
     const docData = await doctorModel.findById(docId).select("-password");
+    if (!docData) {
+      return json({ success: false, message: "Doctor not found" }, undefined, request);
+    }
     if (!docData.available) {
       return json({ success: false, message: "Doctor not available" }, undefined, request);
     }
 
-    const slots_booked = docData.slots_booked || {};
-    if (slots_booked[slotDate]) {
-      if (slots_booked[slotDate].includes(slotTime)) {
-        return json({ success: false, message: "Slot not available" }, undefined, request);
-      }
-      slots_booked[slotDate].push(slotTime);
-    } else {
-      slots_booked[slotDate] = [];
-      slots_booked[slotDate].push(slotTime);
+    // The client's slot list is never trusted: re-derive availability from the
+    // doctor's schedule, blocked dates, slot duration and existing bookings.
+    const slotCheck = validateSlot(docData, slotDate, slotTime);
+    if (!slotCheck.ok) {
+      return json({ success: false, message: slotCheck.message }, undefined, request);
+    }
+
+    // Claim the slot atomically so two concurrent requests cannot both win.
+    const claim = await doctorModel.findOneAndUpdate(
+      {
+        _id: docId,
+        [`slots_booked.${slotDate}`]: { $not: { $elemMatch: { $eq: slotTime } } },
+      },
+      { $addToSet: { [`slots_booked.${slotDate}`]: slotTime } },
+      { new: true }
+    );
+    if (!claim) {
+      return json(
+        { success: false, message: "Slot not available" },
+        undefined,
+        request
+      );
     }
 
     const userData = await userModel.findById(userId).select("-password");
@@ -196,14 +212,21 @@ export async function bookAppointment(request: Request): Promise<Response> {
       docData: docDataClone,
       amount: docData.fees,
       date: Date.now(),
-      appointmentType: appointmentType || "in-person",
       symptoms: symptoms || "",
       notes: notes || "",
     };
 
     const newAppointment = new appointmentModel(appointmentData);
-    await newAppointment.save();
-    await doctorModel.findByIdAndUpdate(docId, { slots_booked });
+    try {
+      await newAppointment.save();
+    } catch (error) {
+      // Release the claim so the slot is not lost if the write failed.
+      await doctorModel.updateOne(
+        { _id: docId },
+        { $pull: { [`slots_booked.${slotDate}`]: slotTime } as never }
+      );
+      throw error;
+    }
     return json({ success: true, message: "Appointment booked successfully" }, undefined, request);
   } catch (error) {
     console.log("Error in creating the appointment:", error);
@@ -358,24 +381,47 @@ export async function rescheduleAppointment(request: Request): Promise<Response>
       return json({ success: false, message: "Doctor not found" }, undefined, request);
     }
 
-    const slots_booked = docData.slots_booked || {};
-    if (slots_booked[newSlotDate] && slots_booked[newSlotDate].includes(newSlotTime)) {
-      return json({ success: false, message: "New slot not available" }, undefined, request);
+    // Same source of truth as booking. The appointment's own current slot is
+    // treated as free so rescheduling to the existing time is not a conflict.
+    const isSameSlot = appointment.slotDate === newSlotDate && appointment.slotTime === newSlotTime;
+    const slotCheck = validateSlot(docData, newSlotDate, newSlotTime, {
+      ignoreSlot: { date: appointment.slotDate, time: appointment.slotTime },
+    });
+    if (!slotCheck.ok) {
+      return json({ success: false, message: slotCheck.message }, undefined, request);
     }
 
-    const oldDate = appointment.slotDate;
-    const oldTime = appointment.slotTime;
-    if (slots_booked[oldDate]) {
-      slots_booked[oldDate] = slots_booked[oldDate].filter(
-        (t: string) => t !== oldTime
+    if (isSameSlot) {
+      return json(
+        { success: true, message: "Appointment already at this time" },
+        undefined,
+        request
       );
     }
-    if (!slots_booked[newSlotDate]) {
-      slots_booked[newSlotDate] = [];
-    }
-    slots_booked[newSlotDate].push(newSlotTime);
 
-    await doctorModel.findByIdAndUpdate(appointment.docId, { slots_booked });
+    // Release the old slot and claim the new one atomically.
+    const oldDate = appointment.slotDate;
+    const oldTime = appointment.slotTime;
+
+    const claim = await doctorModel.findOneAndUpdate(
+      {
+        _id: appointment.docId,
+        [`slots_booked.${newSlotDate}`]: { $not: { $elemMatch: { $eq: newSlotTime } } },
+      },
+      {
+        $pull: { [`slots_booked.${oldDate}`]: oldTime } as never,
+        $addToSet: { [`slots_booked.${newSlotDate}`]: newSlotTime },
+      },
+      { new: true }
+    );
+    if (!claim) {
+      return json(
+        { success: false, message: "New slot not available" },
+        undefined,
+        request
+      );
+    }
+
     await appointmentModel.findByIdAndUpdate(appointmentId, {
       slotDate: newSlotDate,
       slotTime: newSlotTime,

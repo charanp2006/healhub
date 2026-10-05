@@ -5,6 +5,10 @@ const nextConfig: NextConfig = {
     // Keeps Next.js from failing production builds on TS errors
     ignoreBuildErrors: true, 
   },
+  webpack: (config) => {
+    config.cache = false;
+    return config;
+  },
 };
 
 export default nextConfig;

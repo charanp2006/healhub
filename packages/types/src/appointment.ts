@@ -1,5 +1,3 @@
-export type AppointmentType = "in-person" | "video";
-
 export interface Appointment {
   _id: string;
   userId: string;
@@ -20,7 +18,6 @@ export interface Appointment {
   } & Record<string, unknown>;
   amount: number;
   date: number;
-  appointmentType: AppointmentType;
   symptoms?: string;
   notes?: string;
   prescription?: string;

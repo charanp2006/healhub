@@ -7,7 +7,6 @@ import axios from "axios";
 import { toast } from "@/src/components/ui/Toast";
 import { AppContext } from "@/src/context/AppContext";
 import {
-  Video,
   MapPin,
   FileText,
   CalendarClock,
@@ -17,8 +16,7 @@ import {
 } from "lucide-react";
 
 const MyAppointments = () => {
-  const { backendURL, token, getDoctorsData, doctors } =
-    useContext(AppContext);
+  const { backendURL, token, getDoctorsData } = useContext(AppContext);
 
   const [appointments, setAppointments] = useState([]);
   const [rescheduleId, setRescheduleId] = useState(null);
@@ -44,8 +42,29 @@ const MyAppointments = () => {
 
   // Reschedule slot state
   const [resDocSlots, setResDocSlots] = useState([]);
-  const [resSlotIndex, setResSlotIndex] = useState(0);
+  const [resSlotIndex, setResSlotIndex] = useState(null);
   const [resSlotTime, setResSlotTime] = useState("");
+  const [resLoading, setResLoading] = useState(false);
+  const [resError, setResError] = useState("");
+
+  // How many days ahead the API should compute availability for when rescheduling.
+  const RESCHEDULE_WINDOW_DAYS = 7;
+  // Maps the API's lowercase weekday keys onto JS Date#getDay() ordering.
+  const WEEKDAY_INDEX = {
+    sunday: 0,
+    monday: 1,
+    tuesday: 2,
+    wednesday: 3,
+    thursday: 4,
+    friday: 5,
+    saturday: 6,
+  };
+  const formatSlotTime = (time) => {
+    const [h, m] = time.split(":").map(Number);
+    const suffix = h >= 12 ? "PM" : "AM";
+    const hour12 = h % 12 === 0 ? 12 : h % 12;
+    return `${hour12}:${String(m).padStart(2, "0")} ${suffix}`;
+  };
 
   const router = useRouter();
 
@@ -93,63 +112,46 @@ const MyAppointments = () => {
     }
   };
 
-  // Open reschedule modal and load doctor slots
-  const openReschedule = (appointment) => {
+  // Open reschedule modal and load the doctor's real availability.
+  // Uses the same API as the booking page, so the dates and times offered here
+  // are identical to the ones the doctor actually keeps free.
+  const openReschedule = async (appointment) => {
     setRescheduleId(appointment._id);
-    setResSlotIndex(0);
+    setResSlotIndex(null);
     setResSlotTime("");
+    setResLoading(true);
+    setResError("");
 
-    const docInfo = doctors.find((d) => d._id === appointment.docId);
-    if (!docInfo) {
-      toast.error("Doctor data not available");
-      return;
-    }
-
-    // Generate available slots (same logic as Appointment page)
-    const slots = [];
-    const today = new Date();
-    for (let i = 0; i < 7; i++) {
-      const currentDate = new Date(today);
-      currentDate.setDate(currentDate.getDate() + i);
-      const endTime = new Date(today);
-      endTime.setDate(today.getDate() + i);
-      endTime.setHours(21, 0, 0, 0);
-
-      if (today.getDate() === currentDate.getDate()) {
-        currentDate.setHours(
-          currentDate.getHours() > 10 ? currentDate.getHours() + 1 : 10
-        );
-        currentDate.setMinutes(currentDate.getMinutes() > 30 ? 30 : 0);
-      } else {
-        currentDate.setHours(10);
-        currentDate.setMinutes(0);
-      }
-
-      const timeSlots = [];
-      while (currentDate < endTime) {
-        const formattedTime = currentDate.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-        const day = currentDate.getDate();
-        const month = currentDate.getMonth() + 1;
-        const year = currentDate.getFullYear();
-        const slotDate = `${year}-${month < 10 ? "0" + month : month}-${day < 10 ? "0" + day : day}`;
-
-        const isBooked =
-          docInfo.slots_booked[slotDate] &&
-          docInfo.slots_booked[slotDate].includes(formattedTime);
-        if (!isBooked) {
-          timeSlots.push({
-            datetime: new Date(currentDate),
-            time: formattedTime,
-          });
+    try {
+      const { data } = await axios.get(
+        `${backendURL}/api/doctor/${appointment.docId}/availability`,
+        {
+          params: {
+            days: RESCHEDULE_WINDOW_DAYS,
+            // Keep this appointment's own slot selectable.
+            ignoreDate: appointment.slotDate,
+            ignoreTime: appointment.slotTime,
+          },
         }
-        currentDate.setMinutes(currentDate.getMinutes() + 30);
+      );
+
+      if (!data.success) {
+        setResError(data.message || "Could not load availability");
+        setResDocSlots([]);
+        return;
       }
-      slots.push(timeSlots);
+
+      // Only offer days that actually have a free slot.
+      const days = (data.availability || []).filter((d) => d.slots.length > 0);
+      setResDocSlots(days);
+      setResSlotIndex(days.length > 0 ? 0 : null);
+    } catch (error) {
+      console.log("Error loading availability for reschedule:", error);
+      setResError("Could not load availability");
+      setResDocSlots([]);
+    } finally {
+      setResLoading(false);
     }
-    setResDocSlots(slots);
   };
 
   const confirmReschedule = async () => {
@@ -159,11 +161,12 @@ const MyAppointments = () => {
     }
 
     try {
-      const date = resDocSlots[resSlotIndex][0].datetime;
-      const day = date.getDate();
-      const month = date.getMonth() + 1;
-      const year = date.getFullYear();
-      const newSlotDate = `${year}-${month < 10 ? "0" + month : month}-${day < 10 ? "0" + day : day}`;
+      // Canonical YYYY-MM-DD straight from the availability API.
+      const newSlotDate = resDocSlots[resSlotIndex]?.date;
+      if (!newSlotDate) {
+        toast.warn("Please select a new date and time slot");
+        return;
+      }
 
       const { data } = await axios.post(
         `${backendURL}/api/user/reschedule-appointment`,
@@ -307,21 +310,10 @@ const MyAppointments = () => {
 
               {/* Appointment type badge */}
               <div className="flex items-center gap-1 mt-1">
-                {item.appointmentType === "video" ? (
-                  <>
-                    <Video size={14} className="text-primary" />{" "}
-                    <span className="text-xs text-primary font-medium">
-                      Video Call
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <MapPin size={14} className="text-primary" />{" "}
-                    <span className="text-xs text-primary font-medium">
-                      In-Person
-                    </span>
-                  </>
-                )}
+                <MapPin size={14} className="text-primary" />{" "}
+                <span className="text-xs text-primary font-medium">
+                  In-Person
+                </span>
               </div>
 
               <p className="text-text-primary font-medium mt-1">
@@ -438,17 +430,22 @@ const MyAppointments = () => {
             <div className="flex gap-3 overflow-x-auto pb-2">
               {resDocSlots.map((item, index) => (
                 <div
-                  key={index}
+                  key={item.date}
                   onClick={() => {
                     setResSlotIndex(index);
                     setResSlotTime("");
                   }}
                   className={`text-center py-4 min-w-14 rounded-full cursor-pointer text-sm ${resSlotIndex === index ? "bg-primary text-white" : "border border-border"}`}
                 >
-                  <p>{item[0] && daysOfWeek[item[0].datetime.getDay()]}</p>
-                  <p>{item[0] && item[0].datetime.getDate()}</p>
+                  <p>{daysOfWeek[WEEKDAY_INDEX[item.weekday]]}</p>
+                  <p>{Number(item.date.slice(-2))}</p>
                 </div>
               ))}
+              {!resLoading && resDocSlots.length === 0 && (
+                <p className="text-sm text-text-secondary self-center">
+                  {resError || "No available dates to reschedule to"}
+                </p>
+              )}
             </div>
 
             {/* Time slots */}
@@ -456,29 +453,23 @@ const MyAppointments = () => {
               Select a new time
             </p>
             <div className="flex flex-wrap gap-2">
-              {resDocSlots[resSlotIndex] &&
-                resDocSlots[resSlotIndex].map((item, index) => (
-                  <p
-                    key={index}
-                    onClick={() => setResSlotTime(item.time)}
-                    className={`text-xs px-4 py-2 rounded-full cursor-pointer ${item.time === resSlotTime ? "bg-primary text-white" : "border border-border text-text-secondary"}`}
-                  >
-                    {item.time.toLowerCase()}
-                  </p>
-                ))}
-              {resDocSlots[resSlotIndex] &&
-                resDocSlots[resSlotIndex].length === 0 && (
-                  <p className="text-sm text-text-secondary">
-                    No slots available for this day
-                  </p>
-                )}
+              {resDocSlots[resSlotIndex]?.slots.map((time) => (
+                <p
+                  key={time}
+                  onClick={() => setResSlotTime(time)}
+                  className={`text-xs px-4 py-2 rounded-full cursor-pointer ${time === resSlotTime ? "bg-primary text-white" : "border border-border text-text-secondary"}`}
+                >
+                  {formatSlotTime(time)}
+                </p>
+              ))}
             </div>
 
             <button
               onClick={confirmReschedule}
-              className="w-full mt-6 bg-primary text-white py-2.5 rounded-full text-sm font-medium cursor-pointer hover:bg-primary-hover transition-colors"
+              disabled={resLoading || !resSlotTime}
+              className="w-full mt-6 bg-primary text-white py-2.5 rounded-full text-sm font-medium cursor-pointer hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Confirm Reschedule
+              {resLoading ? "Loading..." : "Confirm Reschedule"}
             </button>
           </div>
         </div>

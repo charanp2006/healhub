@@ -84,11 +84,6 @@ export async function getOverviewStats(request: Request): Promise<Response> {
         ? 100
         : 0;
 
-    const videoCount = allAppointments.filter(
-      (a) => a.appointmentType === "video"
-    ).length;
-    const inPersonCount = totalAppointments - videoCount;
-
     return json({
       success: true,
       stats: {
@@ -103,8 +98,6 @@ export async function getOverviewStats(request: Request): Promise<Response> {
         totalRevenue,
         thisMonthRevenue,
         revenueGrowth,
-        videoCount,
-        inPersonCount,
       },
     }, undefined, request);
   } catch (error) {
@@ -265,7 +258,6 @@ export async function getRecentActivity(request: Request): Promise<Response> {
         doctorName: (a as { docData?: { name?: string } }).docData?.name || "Unknown",
         doctorImage: (a as { docData?: { image?: string } }).docData?.image || "",
         speciality: (a as { docData?: { speciality?: string } }).docData?.speciality || "",
-        appointmentType: a.appointmentType || "in-person",
         slotDate: a.slotDate,
         slotTime: a.slotTime,
         amount: a.amount,
