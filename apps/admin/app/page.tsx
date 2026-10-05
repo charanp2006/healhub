@@ -20,7 +20,7 @@ const AdminLanding = () => {
       badge="ADMIN PORTAL"
       title="Run your hospital"
       highlight="with Healhub."
-      description="Manage doctors, hospitals, appointments, billings and analytics from a single command center. Sign in to continue."
+      description="Manage doctors, hospitals, appointments and analytics from a single command center. Sign in to continue."
       primaryLabel="Open Admin Dashboard"
       primaryHref="/admin-dashboard"
       features={[

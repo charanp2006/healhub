@@ -38,8 +38,6 @@ const HospitalAnalytics = () => {
           totalPatients: s.totalPatients ?? 0,
           inPersonCount: s.inPersonCount ?? 0,
           videoCount: s.videoCount ?? 0,
-          onlinePayments: s.onlinePayments ?? 0,
-          cashPayments: s.cashPayments ?? 0,
         });
         setTopDoctors((h.topDoctors || []).map((d) => ({
           ...d,
@@ -101,14 +99,6 @@ const HospitalAnalytics = () => {
                   <div className="flex items-center justify-center h-48">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart><Pie data={[{ name: 'In-Person', value: stats.inPersonCount || 0 }, { name: 'Video', value: stats.videoCount || 0 }]} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value"><Cell fill="#20C3AE" /><Cell fill="#6366F1" /></Pie><Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid #E5E7EB', fontSize: '12px' }} /><Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }} /></PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-                <div className="bg-background-card rounded-xl border border-border p-5 shadow-sm">
-                  <p className="font-semibold text-text-primary mb-4">Payment Methods</p>
-                  <div className="flex items-center justify-center h-48">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart><Pie data={[{ name: 'Online', value: stats.onlinePayments || 0 }, { name: 'Cash', value: stats.cashPayments || 0 }]} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value"><Cell fill="#3B82F6" /><Cell fill="#F59E0B" /></Pie><Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid #E5E7EB', fontSize: '12px' }} /><Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }} /></PieChart>
                     </ResponsiveContainer>
                   </div>
                 </div>

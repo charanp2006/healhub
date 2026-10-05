@@ -21,7 +21,7 @@ const AUTH_ROUTES = [
   "/doctor-profile",
   "/hospital-add-blog",
   "/hospital-add-doctor",
-  "/hospital-billings",
+
   "/hospital-blogs",
   "/hospital-dashboard",
   "/hospital-doctors",
@@ -64,7 +64,7 @@ const PanelShell = ({ children }) => {
       <>
         <SplashScreen
           title="Welcome to Healhub Clinic"
-          subtitle="Manage your clinic, doctors, appointments and billing effortlessly."
+          subtitle="Manage your clinic, doctors and appointments effortlessly."
         />
         {isAuthRoute ? <Login /> : <div className="bg-background-base min-h-screen">{children}</div>}
       </>
@@ -75,7 +75,7 @@ const PanelShell = ({ children }) => {
     <>
       <SplashScreen
         title="Welcome to Healhub Clinic"
-        subtitle="Manage your clinic, doctors, appointments and billing effortlessly."
+        subtitle="Manage your clinic, doctors and appointments effortlessly."
       />
       <div className="bg-background-base min-h-screen">
         <div className="hidden md:block">

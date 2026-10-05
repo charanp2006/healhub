@@ -14,7 +14,6 @@ import {
   BedDouble,
   FileText,
   BarChart3,
-  DollarSign,
   Plus,
 } from "lucide-react";
 
@@ -34,7 +33,6 @@ const moreLinks = [
   { label: "Blog Posts", href: "/blogs-list", Icon: FileText },
   { label: "Analytics", href: "/analytics", Icon: BarChart3 },
   { label: "Hosp. Analytics", href: "/hospital-analytics", Icon: BarChart3 },
-  { label: "Billing", href: "/billing", Icon: DollarSign },
 ];
 
 // Mobile-only fixed bottom navigation for the admin panel.

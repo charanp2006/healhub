@@ -15,7 +15,7 @@ import {
   BarChart3,
   Plus,
   UserRound,
-  DollarSign,
+
 } from "lucide-react";
 import { HospitalContext } from "@/src/context/HospitalContext";
 import { DoctorContext } from "@/src/context/DoctorContext";
@@ -60,7 +60,7 @@ const MobileTabBar = () => {
     : [
         { label: "Add Doctor", href: "/hospital-add-doctor", Icon: Plus },
         { label: "Blog Posts", href: "/hospital-blogs", Icon: FileText },
-        { label: "Billings", href: "/hospital-billings", Icon: DollarSign },
+
         {
           label: "Analytics",
           href: "/hospital-panel-analytics",

@@ -9,7 +9,7 @@ import { HospitalContext } from "@/src/context/HospitalContext";
 import { DoctorContext } from "@/src/context/DoctorContext";
 import {
   BarChart3,
-  DollarSign,
+
   FileText,
   BedDouble,
   Calendar,
@@ -48,10 +48,6 @@ const Sidebar = () => {
           <Link href="/hospital-blogs" className={active("/hospital-blogs")}>
             <FileText size={20} />
             <p className="hidden md:block">Blog Posts</p>
-          </Link>
-          <Link href="/hospital-billings" className={active("/hospital-billings")}>
-            <DollarSign size={20} />
-            <p className="hidden md:block">Billings</p>
           </Link>
           <Link href="/hospital-panel-analytics" className={active("/hospital-panel-analytics")}>
             <BarChart3 size={20} />

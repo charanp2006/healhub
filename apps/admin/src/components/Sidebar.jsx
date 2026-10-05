@@ -15,7 +15,6 @@ import {
   FileText,
   BarChart3,
   Activity,
-  DollarSign,
   LogOut,
   ChevronsLeft,
   ChevronsRight,
@@ -55,10 +54,6 @@ const NAV = [
       { label: "Analytics", href: "/analytics", Icon: BarChart3 },
       { label: "Hospital Analytics", href: "/hospital-analytics", Icon: Activity },
     ],
-  },
-  {
-    section: "Finance",
-    items: [{ label: "Billing", href: "/billing", Icon: DollarSign }],
   },
 ];
 

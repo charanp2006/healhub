@@ -16,7 +16,6 @@ const AUTH_ROUTES = [
   "/admin-dashboard",
   "/all-appointments",
   "/analytics",
-  "/billing",
   "/blogs-list",
   "/doctor-list",
   "/hospital-analytics",

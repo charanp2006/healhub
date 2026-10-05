@@ -25,13 +25,13 @@ const ClinicLanding = () => {
       badge="CLINIC & DOCTOR PORTAL"
       title="Manage your clinic"
       highlight="with Healhub."
-      description="Bookings, patients, doctors and billing — everything your clinic needs, in one secure dashboard. Sign in to continue."
+      description="Bookings, patients and doctors — everything your clinic needs, in one secure dashboard. Sign in to continue."
       primaryLabel="Open Clinic Dashboard"
       primaryHref="/hospital-dashboard"
       features={[
         "Multi-role access",
         "Appointment management",
-        "Room & billing tools",
+        "Room management tools",
       ]}
     />
   );

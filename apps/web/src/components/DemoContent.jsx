@@ -18,7 +18,7 @@ const projectModules = [
       "Approve and manage doctors, hospitals, and clinics",
       "Manage room categories and availability",
       "Publish and moderate blogs",
-      "Track analytics and billing",
+      "Track analytics and revenue",
     ],
   },
   {
@@ -27,7 +27,7 @@ const projectModules = [
       "Node/Express API that powers data, security, and business logic.",
     points: [
       "JWT-based authentication for roles",
-      "Appointment, billing, and bed allocation flows",
+      "Appointment completion and bed allocation flows",
       "Cloudinary image uploads via Multer",
       "MongoDB models for users, doctors, hospitals, clinics, and blogs",
     ],
@@ -51,7 +51,7 @@ const roleCards = [
   },
   {
     title: "Admin",
-    summary: "Oversees all entities, approvals, billing, and reporting.",
+    summary: "Oversees all entities, approvals, and reporting.",
   },
 ];
 

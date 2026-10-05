@@ -75,7 +75,7 @@ const HospitalsMgmt = () => {
       </div>
       <Card padded={false} className="text-sm overflow-hidden">
         <div className="hidden sm:grid grid-cols-[0.5fr_1.5fr_0.8fr_0.8fr_0.8fr_1fr_1fr] gap-1 py-3 px-6 border-b border-border bg-background-muted text-[11px] font-semibold uppercase tracking-wide text-text-secondary">
-          <p>#</p><p>Hospital</p><p>City</p><p>Doctors</p><p>Appointments</p><p>Status</p><p>Billing Summary</p>
+          <p>#</p><p>Hospital</p><p>City</p><p>Doctors</p><p>Appointments</p><p>Status</p><p>Revenue</p>
         </div>
         {loading ? (
           <SkeletonList rows={6} className="p-6" />
