@@ -21,12 +21,11 @@ This repository is the **Next.js 16 monorepo** rebuild of Healhub (previously a 
 
 ### Backend (`apps/api`)
 - **Node.js** (LTS) — runtime
-- **Next.js API routes** — primary REST API (auth, CRUD, billing)
+- **Next.js API routes** — primary REST API (auth, CRUD)
 - **next-auth** — authentication
 - **Mongoose** — ODM
 - **Zod** — validation
 - **Cloudinary** — image storage
-- **Razorpay** — payments
 
 ### Database
 - **MongoDB** — primary NoSQL database
@@ -63,17 +62,17 @@ healhub/
 
 | Website | Users | Port | Purpose |
 |---------|-------|------|---------|
-| **web** | Patients | 3000 | Discover doctors/hospitals, book appointments, pay, view prescriptions |
-| **admin** | Platform admins | 3001 | User management, content moderation, analytics, billing |
+| **web** | Patients | 3000 | Discover doctors/hospitals, book appointments, view prescriptions |
+| **admin** | Platform admins | 3001 | User management, content moderation, analytics |
 | **hospital** | Hospitals/Clinics | 3002 | Manage doctors, rooms/beds, patients, revenue |
-| **api** | (backend) | 4000 | REST API — auth, CRUD, billing, MongoDB |
+| **api** | (backend) | 4000 | REST API — auth, CRUD, MongoDB |
 
 ---
 
 ## 🧱 Architecture: Hybrid Backend
 
 ```
-web / admin / hospital  →  Next.js API routes (apps/api)  (auth, CRUD, billing, DB)
+web / admin / hospital  →  Next.js API routes (apps/api)  (auth, CRUD, DB)
 ```
 
 - The whole REST/CRUD layer lives in `apps/api` (Next.js routes + Mongoose).
@@ -100,7 +99,6 @@ Four roles with role-based access control (RBAC):
 - Node.js 20+ (LTS recommended)
 - npm 11+ (this repo uses **npm workspaces**, not pnpm)
 - MongoDB (local or Mongo Atlas)
-- Razorpay account *(for payments)*
 - Cloudinary account *(for images)*
 
 ### 1. Install & setup Monorepo
@@ -153,10 +151,9 @@ npm run build
 - [x] Define architecture & tech stack (monorepo, Next.js 16, Tailwind v4, MongoDB)
 - [x] Scaffold monorepo with Turborepo + npm workspaces
 - [x] Shared `@healhub/ui` package — theme (light/dark), splash, landing, 404, brand assets
-- [ ] Build **web** (patient: discover, book, pay, prescriptions)
+- [ ] Build **web** (patient: discover, book, prescriptions)
 - [ ] Build **admin** CMS (users, content, analytics)
 - [ ] Build **hospital** panel (doctors, rooms/beds, revenue)
-- [ ] Razorpay payments
 - [ ] Cloudinary image uploads
 - [ ] 4-role RBAC auth
 - [ ] Firebase real-time sync *(optional)*

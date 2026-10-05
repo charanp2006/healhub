@@ -25,10 +25,9 @@ The platform solves real-world healthcare challenges:
 1. **Discovery Phase**: A patient visits Healhub and discovers doctors by speciality (Cardiology, Dermatology, etc.) and hospitals in their area
 2. **Selection Phase**: They view doctor profiles with detailed info (experience, fees, ratings, reviews)
 3. **Booking Phase**: Select a convenient date and time slot, choose between in-person or video appointment
-4. **Payment Phase**: Make secure payment through Razorpay with multiple payment options
-5. **Appointment Phase**: Receive appointment confirmation and reminders
-6. **Consultation Phase**: Attend the appointment (in-person or via video call)
-7. **Follow-up Phase**: Receive prescriptions, medical reports, and book follow-up appointments if needed
+4. **Appointment Phase**: Receive appointment confirmation and reminders
+5. **Consultation Phase**: Attend the appointment (in-person or via video call)
+6. **Follow-up Phase**: Receive prescriptions, medical reports, and book follow-up appointments if needed
 
 ### The Doctor Workflow
 1. **Registration**: Join the platform and set up their professional profile
@@ -44,7 +43,7 @@ The platform solves real-world healthcare challenges:
 2. **Doctor Network**: Manage doctors working at their facility
 3. **Resources**: Add room categories (General Ward, ICU, Private Room, etc.), manage bed allocation
 4. **Patient Management**: Track patient admissions and discharges
-5. **Revenue Tracking**: Monitor earnings, billing, and financial reports
+5. **Revenue Tracking**: Monitor earnings and revenue reports
 6. **Content**: Publish health awareness blogs and articles
 7. **Analytics**: Get insights into hospital performance and utilization
 
@@ -100,7 +99,6 @@ graph TB
         C[Express API Server<br/>Node.js]
         D[Authentication<br/>JWT Tokens]
         E[File Storage<br/>Cloudinary]
-        F[Payment Gateway<br/>Razorpay]
     end
     
     subgraph "Database Layer"
@@ -117,7 +115,6 @@ graph TB
     C -->|Verify Token| D
     C -->|Store/Retrieve| G
     C -->|Upload Images| E
-    C -->|Process Payments| F
     C -->|Send Notifications| H
     C -->|Send Alerts| I
     
@@ -147,15 +144,7 @@ flowchart LR
     K -->|Yes| L[Select Date & Time]
     L --> M[Choose Type: In-person/Video]
     M --> N[Add Symptoms/Notes]
-    N --> O[Proceed to Payment]
-    O --> P{Payment Method}
-    P -->|Card| Q[Card Payment]
-    P -->|UPI| R[UPI Payment]
-    P -->|Wallet| S[Wallet Payment]
-    Q --> T[Payment Success]
-    R --> T
-    S --> T
-    T --> U[Booking Confirmed]
+    N --> U[Booking Confirmed]
     U --> V[Receive Confirmation Email]
     V --> W[Attend Appointment]
     W --> X[Receive Prescription]
@@ -165,7 +154,6 @@ flowchart LR
     Z --> AA[End]
     
     style A fill:#4CAF50
-    style T fill:#4CAF50
     style U fill:#4CAF50
     style AA fill:#2196F3
 ```
@@ -210,7 +198,7 @@ flowchart LR
     B --> C{Choose Operation}
     C -->|Manage Doctors| D[View Doctor List]
     C -->|Manage Rooms| E[Room Categories]
-    C -->|View Billing| F[Revenue Reports]
+    C -->|View Revenue| F[Revenue Reports]
     C -->|View Analytics| G[Hospital Analytics]
     
     D --> H[Add New Doctor]
@@ -227,7 +215,6 @@ flowchart LR
     
     F --> P[View Revenue Trends]
     P --> Q[Appointment Revenue]
-    P --> R[Room Revenue]
     
     G --> S[Track Occupancy]
     G --> T[Doctor Performance]
@@ -287,22 +274,9 @@ flowchart LR
   - Provide additional information for the doctor
 - **Real-Time Availability**: System automatically shows only available slots, no overbooking
 
-**Real-World Example**: Amit has a skin issue. He books Dr. Patel's appointment for Saturday 3 PM (video call), explains his symptoms, pays ₹500, and gets confirmation with doctor's contact details.
+**Real-World Example**: Amit has a skin issue. He books Dr. Patel's appointment for Saturday 3 PM (video call), explains his symptoms, and gets confirmation with doctor's contact details.
 
-#### 4. **Secure Payment & Multiple Options**
-- **Razorpay Integration**: Use any major payment method
-  - Credit/Debit Card (Visa, Mastercard, RuPay)
-  - Internet Banking (All major banks)
-  - UPI (Google Pay, PhonePe, Paytm, etc.)
-  - Wallet services
-  - EMI options for larger amounts
-- **Transparent Pricing**: No hidden charges, see full cost breakdown
-- **Instant Confirmation**: Payment verified immediately, appointment confirmed
-- **Digital Receipt**: Receive payment receipt and booking confirmation via email
-
-**Real-World Example**: Sneha books an appointment for ₹800. She chooses to pay via Google Pay UPI, transaction completes in 5 seconds, and she gets instant booking confirmation.
-
-#### 5. **Appointment Management Dashboard**
+#### 4. **Appointment Management Dashboard**
 - **Upcoming Appointments**: See all scheduled appointments in a timeline
 - **Appointment Details**: 
   - Doctor name and speciality
@@ -320,7 +294,7 @@ flowchart LR
 
 **Real-World Example**: Vikram has an appointment tomorrow. He opens his dashboard, sees all details, gets directions to the hospital, and has the video call link ready before the appointment time.
 
-#### 6. **Prescriptions & Medical Records**
+#### 5. **Prescriptions & Medical Records**
 - **Digital Prescriptions**: Receive doctor's prescription digitally after consultation
 - **View Medications**: Complete list of medicines prescribed with dosage and duration
   - Medicine name
@@ -333,7 +307,7 @@ flowchart LR
 
 **Real-World Example**: After consulting Dr. Gupta for fever, Shweta receives a digital prescription on Healhub. She downloads it, shows it to the pharmacist, and gets medicines without any confusion.
 
-#### 7. **Doctor & Hospital Ratings**
+#### 6. **Doctor & Hospital Ratings**
 - **Rate After Consultation**: Give ratings and reviews after appointment completion
 - **Detailed Feedback**: Share your experience
   - Doctor's listening skills and support
@@ -345,7 +319,7 @@ flowchart LR
 
 **Real-World Example**: After a successful treatment, Neha rates Dr. Mehta 5 stars and writes: "Very caring doctor, explained everything clearly, treatment worked within a week!"
 
-#### 8. **Health Blogs & Articles**
+#### 7. **Health Blogs & Articles**
 - **Read Health Tips**: Educational content written by doctors and hospitals
   - "How to Manage Diabetes"
   - "Healthy Heart: Prevention Tips"
@@ -357,7 +331,7 @@ flowchart LR
 
 **Real-World Example**: Kavya wants to understand hypertension. She reads a detailed blog by Dr. Iyer on Healhub about causes, symptoms, prevention, and management.
 
-#### 9. **User Profile & Medical History**
+#### 8. **User Profile & Medical History**
 - **Personal Information**:
   - Name, email, phone number
   - Date of birth and gender
@@ -528,14 +502,12 @@ flowchart LR
 - **Discharge Patients**:
   - Mark room as discharged
   - Generate discharge summary
-  - Automatic billing calculation
   - Free up bed for next patient
   
 - **Historical Data**:
   - View admission/discharge history
   - Track which patients stayed in which rooms
   - Length of stay calculations
-  - Revenue per room
 
 **Real-World Example**: Star Hospital has 100 beds. On a given day:
 - General Ward: 20/25 beds occupied (80%)
@@ -543,28 +515,7 @@ flowchart LR
 - ICU: 8/10 occupied (80%)
 They see these metrics in real-time and can make informed decisions about pricing and promotions.
 
-#### 5. **Billing & Revenue Management**
-- **Automatic Calculations**: System calculates bills based on
-  - Room charges per day
-  - Doctor consultation fees
-  - Procedure costs
-  - Medication charges
-  - Lab test costs
-  - Equipment usage
-  
-- **Invoice Generation**: Create detailed invoices for patients
-- **Payment Tracking**: See which invoices are paid and pending
-- **Revenue Reports**: Monthly, quarterly, annual reports
-- **Insurance Integration**: Track insurance claims
-
-**Real-World Example**: A patient admitted for 5 days in private room:
-- Room charges: ₹2,500/day × 5 = ₹12,500
-- Doctor fees: ₹2,000 × 3 visits = ₹6,000
-- Medications: ₹5,000
-- Tests: ₹3,000
-- **Total Bill: ₹26,500**
-
-#### 6. **Appointment Management**
+#### 5. **Appointment Management**
 - **See All Appointments**: View appointments at the hospital
 - **Track No-Shows**: Monitor patient attendance
 - **Resource Planning**: Ensure doctors and rooms are available
@@ -572,7 +523,7 @@ They see these metrics in real-time and can make informed decisions about pricin
 
 **Real-World Example**: Hope Hospital sees that 15% of patients miss appointments on Mondays. They start sending SMS reminders and reduce no-shows to 5%.
 
-#### 7. **Blog Publishing & Content Marketing**
+#### 6. **Blog Publishing & Content Marketing**
 - **Health Awareness**: Publish articles about health conditions
 - **Hospital Services**: Write about special services and departments
 - **Patient Education**: Help patients understand treatments
@@ -581,7 +532,7 @@ They see these metrics in real-time and can make informed decisions about pricin
 
 **Real-World Example**: Apollo Hospital publishes "Complete Guide to Open Heart Surgery" which attracts 10,000 patient visits in a month and converts 50 into consultations.
 
-#### 8. **Hospital Analytics & Reporting**
+#### 7. **Hospital Analytics & Reporting**
 - **Key Metrics Dashboard**:
   - Total appointments
   - Patient satisfaction ratings
@@ -598,7 +549,6 @@ They see these metrics in real-time and can make informed decisions about pricin
   
 - **Financial Reports**:
   - Revenue by department
-  - Doctor commission calculations
   - Operating costs vs. revenue
   - Profit margins
 
@@ -608,7 +558,7 @@ They see these metrics in real-time and can make informed decisions about pricin
 - October-November are peak months (40% higher revenue)
 - They use this to hire more cardiologists and plan surgeries accordingly.
 
-#### 9. **Quality Control & Compliance**
+#### 8. **Quality Control & Compliance**
 - **Staff Management**: Manage hospital staff on the platform
 - **Service Feedback**: Monitor patient feedback systematically
 - **Compliance Tracking**: Ensure all regulations are met
@@ -686,18 +636,14 @@ Then approves the registration.
 - **Filter & Search**: By doctor, hospital, date, status
 - **Dispute Resolution**: Handle appointment-related complaints
   - Patient vs. Doctor disputes
-  - Refund requests
   - Rescheduling issues
 - **Quality Assurance**: Ensure good service quality
 
-**Real-World Example**: If a patient complains that a doctor didn't show up, admin can see the appointment record, contact both parties, and process a refund.
+**Real-World Example**: If a patient complains that a doctor didn't show up, admin can see the appointment record and contact both parties.
 
 #### 5. **Revenue & Financial Analytics**
 - **System-Wide Revenue**:
-  - Total commission earned
   - Revenue by category (consultations, room bookings, etc.)
-  - Payment method analysis
-  - Refund and dispute costs
   
 - **Growth Metrics**:
   - Month-on-month revenue growth
@@ -723,23 +669,7 @@ Then approves the registration.
 
 **Real-World Example**: Admin reviews a blog by a doctor on diabetes treatment. Checks if information is accurate, citations are valid, then approves it for publishing.
 
-#### 7. **Billing & Reconciliation**
-- **Doctor Payments**: 
-  - Calculate doctor commissions
-  - Generate payment records
-  - Process payouts
-  - Handle disputes
-  
-- **Hospital Settlements**:
-  - Calculate hospital earnings
-  - Manage revenue sharing
-  - Process transfers
-  
-- **Financial Reports**: Complete financial statements
-
-**Real-World Example**: Dr. Singh earned ₹100,000 from 50 consultations. Admin calculates Healhub commission (20%), transfers ₹80,000 to doctor's account.
-
-#### 8. **System Analytics & Dashboards**
+#### 7. **System Analytics & Dashboards**
 - **Doctor Analytics**:
   - Top performing doctors
   - Highest rated doctors
@@ -765,7 +695,7 @@ Then approves the registration.
 - Delhi region has 50,000 users
 - Repeat appointment rate is 45%
 
-#### 9. **Complaint & Support Management**
+#### 8. **Complaint & Support Management**
 - **Track Complaints**: 
   - Patient complaints about doctors
   - Doctor complaints about patients
@@ -775,7 +705,7 @@ Then approves the registration.
 - **Resolution Process**:
   - Log complaint
   - Investigate
-  - Take action (warning, suspension, refund)
+  - Take action (warning, suspension)
   - Document outcome
   
 - **Feedback Systems**: Gather system-wide feedback
@@ -785,9 +715,8 @@ Then approves the registration.
 2. Contacts both doctor and patient
 3. If verified, sends warning to doctor
 4. If serious, may suspend account
-5. Processes refund or credit if needed
 
-#### 10. **User Management**
+#### 9. **User Management**
 - **Patient Management**:
   - View patient profiles
   - Handle account issues
@@ -803,7 +732,6 @@ Then approves the registration.
 - **Hospital Compliance**:
   - Verify operational standards
   - Check bed availability accuracy
-  - Review billing practices
   - Monitor service quality
 
 ---
@@ -826,7 +754,6 @@ Then approves the registration.
 - **JWT** - Secure token-based authentication
 - **Bcrypt** - Password hashing and security
 - **Cloudinary** - Cloud-based image storage and optimization
-- **Razorpay** - Payment gateway integration
 
 ---
 
@@ -834,20 +761,12 @@ Then approves the registration.
 
 ### How Healhub Makes Money
 
-1. **Consultation Commission** (Primary Revenue)
-   - Takes small commission (10-20%) from each consultation fee
-   - Example: Doctor charges ₹500, Healhub takes ₹75, doctor gets ₹425
-
-2. **Room Booking Commission** (Secondary Revenue)
-   - Commission on hospital room bookings
-   - Example: ₹5,000 room booking, Healhub takes ₹500
-
-3. **Premium Features** (Future)
+1. **Premium Features** (Future)
    - Premium doctor profiles (featured listings)
    - Hospital advertising (promoted positions)
    - Analytics pro packages
 
-4. **Data Insights** (Future)
+2. **Data Insights** (Future)
    - Pharmaceutical companies interested in patient health trends
    - Insurance companies needing health data
    - Government health initiatives
@@ -879,7 +798,6 @@ Then approves the registration.
 - **HIPAA Compliance**: Follows healthcare data protection standards
 - **Doctor Verification**: All doctors verified with credentials
 - **Hospital Verification**: All hospitals checked before listing
-- **Secure Payments**: PCI-DSS compliant payment processing via Razorpay
 - **Privacy**: Strict patient privacy policies, GDPR compliant
 - **Audit Trails**: All important actions logged for compliance
 
@@ -921,7 +839,6 @@ When fully operational, Healhub aims to provide:
 - npm or yarn
 - MongoDB
 - Cloudinary account
-- Razorpay account (for payments)
 
 ### Quick Setup
 
@@ -1005,7 +922,7 @@ For issues and questions:
 📱 **Patient Convenience**: One-stop solution for all healthcare needs
 💰 **Revenue Transparency**: Clear breakdown of earnings for doctors and hospitals
 📊 **Data-Driven**: Analytics and insights for better decision making
-🔒 **Trust & Security**: Verified professionals and secure transactions
+🔒 **Trust & Security**: Verified professionals and strict privacy controls
 
 ---
 
@@ -1021,7 +938,6 @@ For issues and questions:
 - ✅ Manage appointment history
 - ✅ View and download prescriptions
 - ✅ Read health blogs and articles
-- ✅ Secure payment integration
 
 ### For Doctors
 - ✅ Manage profile and availability
@@ -1036,7 +952,7 @@ For issues and questions:
 - ✅ Manage doctor roster
 - ✅ Manage room categories and bed allocation
 - ✅ Admit/discharge patients
-- ✅ Track revenue and billing
+- ✅ Track revenue
 - ✅ Access analytics and reports
 - ✅ Publish hospital blogs
 - ✅ Manage hospital profile
@@ -1047,7 +963,6 @@ For issues and questions:
 - ✅ Appointment monitoring
 - ✅ Revenue and analytics tracking
 - ✅ Blog moderation
-- ✅ Billing management
 - ✅ System-wide analytics
 
 ## 📊 Database Schema
@@ -1059,7 +974,6 @@ For issues and questions:
 - **Appointments** - Booking records
 - **Rooms** - Room categories and allocations
 - **Blogs** - Published articles
-- **Billing** - Revenue tracking
 - **Prescriptions** - Medical prescriptions
 
 ## 🔐 Authentication
@@ -1072,14 +986,6 @@ Healhub uses JWT (JSON Web Tokens) for secure authentication:
 
 All tokens are stored in localStorage and included in API requests.
 
-## 💳 Payment Integration
-
-Razorpay integration for secure appointment payments:
-- Supports all major payment methods
-- Instant payment confirmation
-- Automated receipt generation
-- Refund management
-
 ## 📡 API Endpoints
 
 ### Main Categories
@@ -1090,7 +996,6 @@ Razorpay integration for secure appointment payments:
 - `/api/bed` - Room/bed management
 - `/api/blog` - Blog operations
 - `/api/analytics` - Analytics data
-- `/api/billing` - Billing operations
 
 [Detailed API documentation →](./backend/README.md#api-endpoints)
 
@@ -1121,7 +1026,6 @@ Razorpay integration for secure appointment payments:
 - ✅ Secure file uploads (Cloudinary)
 - ✅ CORS protection
 - ✅ Input validation and sanitization
-- ✅ Secure payment handling
 
 ## 📝 Environment Variables
 
@@ -1198,7 +1102,7 @@ For issues and questions:
 🏥 **Hospital Management**: Complete room and bed allocation system
 💬 **Communication**: In-app messaging between patients and doctors
 📊 **Analytics**: Comprehensive dashboards with insights
-💰 **Revenue Tracking**: Detailed billing and payment management
+💰 **Revenue Tracking**: Detailed revenue analytics and reporting
 🔒 **Security**: Enterprise-grade security measures
 🚀 **Scalability**: Designed for growth
 
