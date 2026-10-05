@@ -20,7 +20,6 @@ const appointmentSchema = new mongoose.Schema({
   prescription: { type: String, default: "" },
   followUpDate: { type: String, default: "" },
   cancelled: { type: Boolean, default: false },
-  payment: { type: Boolean, default: false },
   isCompleted: { type: Boolean, default: false },
   rescheduled: { type: Boolean, default: false },
   rating: { type: Number, min: 1, max: 5 },
