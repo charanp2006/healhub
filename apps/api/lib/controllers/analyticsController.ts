@@ -2,7 +2,6 @@ import appointmentModel from "../models/appointmentModel";
 import doctorModel from "../models/doctorModel";
 import userModel from "../models/userModel";
 import hospitalModel from "../models/hospitalModel";
-import billingModel from "../models/billingModel";
 import { connectDB } from "../db";
 import { json, bad } from "../http";
 import type { AnyDoc } from "../types";
@@ -58,12 +57,12 @@ export async function getOverviewStats(request: Request): Promise<Response> {
         : 0;
 
     const totalRevenue = allAppointments
-      .filter((a) => a.isCompleted || a.payment)
+      .filter((a) => a.isCompleted)
       .reduce((sum, a) => sum + (a.amount || 0), 0);
 
     const thisMonthRevenue = allAppointments
       .filter(
-        (a) => a.date >= thisMonthStart && (a.isCompleted || a.payment)
+        (a) => a.date >= thisMonthStart && (a.isCompleted)
       )
       .reduce((sum, a) => sum + (a.amount || 0), 0);
 
@@ -72,7 +71,7 @@ export async function getOverviewStats(request: Request): Promise<Response> {
         (a) =>
           a.date >= lastMonthStart &&
           a.date < lastMonthEnd &&
-          (a.isCompleted || a.payment)
+          (a.isCompleted)
       )
       .reduce((sum, a) => sum + (a.amount || 0), 0);
 
@@ -90,11 +89,6 @@ export async function getOverviewStats(request: Request): Promise<Response> {
     ).length;
     const inPersonCount = totalAppointments - videoCount;
 
-    const onlinePayments = allAppointments.filter((a) => a.payment).length;
-    const cashPayments = allAppointments.filter(
-      (a) => !a.payment && (a.isCompleted || !a.cancelled)
-    ).length;
-
     return json({
       success: true,
       stats: {
@@ -111,8 +105,6 @@ export async function getOverviewStats(request: Request): Promise<Response> {
         revenueGrowth,
         videoCount,
         inPersonCount,
-        onlinePayments,
-        cashPayments,
       },
     }, undefined, request);
   } catch (error) {
@@ -157,7 +149,7 @@ export async function getAppointmentTrends(request: Request): Promise<Response> 
       const completed = monthAppointments.filter((a) => a.isCompleted).length;
       const cancelled = monthAppointments.filter((a) => a.cancelled).length;
       const revenue = monthAppointments
-        .filter((a) => a.isCompleted || a.payment)
+        .filter((a) => a.isCompleted)
         .reduce((sum, a) => sum + (a.amount || 0), 0);
 
       trends.push({ month: monthLabel, booked, completed, cancelled, revenue });
@@ -187,7 +179,7 @@ export async function getDoctorPerformance(request: Request): Promise<Response> 
       const completed = docAppointments.filter((a) => a.isCompleted).length;
       const cancelled = docAppointments.filter((a) => a.cancelled).length;
       const revenue = docAppointments
-        .filter((a) => a.isCompleted || a.payment)
+        .filter((a) => a.isCompleted)
         .reduce((sum, a) => sum + (a.amount || 0), 0);
       const patientIds = new Set(
         docAppointments.map((a) => a.userId?.toString()).filter(Boolean)
@@ -233,7 +225,7 @@ export async function getSpecialityStats(request: Request): Promise<Response> {
         specialityMap[spec] = { total: 0, revenue: 0 };
       }
       specialityMap[spec].total += 1;
-      if (a.isCompleted || a.payment) {
+      if (a.isCompleted) {
         specialityMap[spec].revenue += a.amount || 0;
       }
     });
@@ -326,10 +318,6 @@ export async function getHospitalAnalytics(request: Request): Promise<Response> 
           .lean()
       : [];
 
-    const billings = await billingModel
-      .find({ hospitalId: { $in: hospitalIds } })
-      .lean();
-
     const now = new Date();
     const thisMonthStart = new Date(
       now.getFullYear(),
@@ -352,9 +340,6 @@ export async function getHospitalAnalytics(request: Request): Promise<Response> 
       );
       const hospitalDoctors = doctors.filter(
         (d) => d.hospitalId?.toString() === hId
-      );
-      const hospitalBillings = billings.filter(
-        (b) => b.hospitalId?.toString() === hId
       );
 
       const totalAppointments = hospitalAppointments.length;
@@ -386,34 +371,17 @@ export async function getHospitalAnalytics(request: Request): Promise<Response> 
           : 0;
 
       const totalRevenue = hospitalAppointments
-        .filter((a) => a.isCompleted || a.payment)
+        .filter((a) => a.isCompleted)
         .reduce((sum, a) => sum + (a.amount || 0), 0);
 
       const thisMonthRevenue = hospitalAppointments
-        .filter(
-          (a) => a.date >= thisMonthStart && (a.isCompleted || a.payment)
-        )
+        .filter((a) => a.date >= thisMonthStart && a.isCompleted)
         .reduce((sum, a) => sum + (a.amount || 0), 0);
 
       const completionRate =
         totalAppointments > 0
           ? Math.round((completedAppointments / totalAppointments) * 100)
           : 0;
-
-      const totalBilled = hospitalBillings.reduce(
-        (sum, b) => sum + b.totalRevenue,
-        0
-      );
-      const totalCommission = hospitalBillings.reduce(
-        (sum, b) => sum + b.commissionAmount,
-        0
-      );
-      const pendingBillings = hospitalBillings.filter(
-        (b) => b.status === "Pending"
-      ).length;
-      const paidBillings = hospitalBillings.filter(
-        (b) => b.status === "Paid"
-      ).length;
 
       const doctorAppointmentCounts: Record<string, number> = {};
       hospitalAppointments.forEach((a) => {
@@ -462,7 +430,7 @@ export async function getHospitalAnalytics(request: Request): Promise<Response> 
             (a) =>
               a.date >= monthStart.getTime() &&
               a.date < monthEnd.getTime() &&
-              (a.isCompleted || a.payment)
+              a.isCompleted
           )
           .reduce((sum, a) => sum + (a.amount || 0), 0);
 
@@ -490,12 +458,6 @@ export async function getHospitalAnalytics(request: Request): Promise<Response> 
           totalRevenue,
           thisMonthRevenue,
           completionRate,
-        },
-        billing: {
-          totalBilled,
-          totalCommission,
-          pendingBillings,
-          paidBillings,
         },
         topDoctors,
         monthlyTrend,

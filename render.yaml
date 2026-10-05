@@ -28,15 +28,9 @@ services:
         sync: false
       - key: CORS_ORIGIN
         sync: false
-      - key: CURRENCY
-        sync: false
       - key: CLOUDINARY_NAME
         sync: false
       - key: CLOUDINARY_API_KEY
         sync: false
       - key: CLOUDINARY_SECRET_KEY
-        sync: false
-      - key: RAZORPAY_KEY_ID
-        sync: false
-      - key: RAZORPAY_KEY_SECRET
         sync: false

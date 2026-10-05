@@ -4,7 +4,6 @@ import userModel from "../models/userModel";
 import doctorModel from "../models/doctorModel";
 import hospitalModel from "../models/hospitalModel";
 import appointmentModel from "../models/appointmentModel";
-import razorpay from "razorpay";
 import { connectDB } from "../db";
 import { uploadImageToCloudinary } from "../upload";
 import { json, bad, tooMany } from "../http";
@@ -14,13 +13,6 @@ import {
   checkLoginRateGate,
   recordLoginAttempt,
 } from "../ratelimit";
-
-function getRazorpay() {
-  return new razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID || "",
-    key_secret: process.env.RAZORPAY_KEY_SECRET || "",
-  });
-}
 
 export async function registerUser(request: Request): Promise<Response> {
   try {
@@ -395,55 +387,6 @@ export async function rescheduleAppointment(request: Request): Promise<Response>
     }, undefined, request);
   } catch (error) {
     console.log("Error in rescheduling appointment:", error);
-    return json({ success: false, message: (error as Error).message }, undefined, request);
-  }
-}
-
-export async function paymentRazorpay(request: Request): Promise<Response> {
-  try {
-    await connectDB();
-    const auth = await verifyUser(request.headers.get("token"));
-    if (!auth.ok) return bad(auth.message, request);
-
-    const { appointmentId } = await request.json();
-    const appointmentData = await appointmentModel.findById(appointmentId);
-    if (!appointmentData || appointmentData.cancelled) {
-      return json({
-        success: false,
-        message: "Appointment cancelled or not found",
-      }, undefined, request);
-    }
-
-    const options = {
-      amount: appointmentData.amount * 100,
-      currency: process.env.CURRENCY || "INR",
-      receipt: appointmentId.toString(),
-    };
-    const order = await getRazorpay().orders.create(options);
-    return json({ success: true, order }, undefined, request);
-  } catch (error) {
-    console.log("Error making payment:", error);
-    return json({ success: false, message: (error as Error).message }, undefined, request);
-  }
-}
-
-export async function verifyRazorpay(request: Request): Promise<Response> {
-  try {
-    await connectDB();
-    const auth = await verifyUser(request.headers.get("token"));
-    if (!auth.ok) return bad(auth.message, request);
-
-    const { razorpay_order_id } = await request.json();
-    const orderInfo = await getRazorpay().orders.fetch(razorpay_order_id);
-    if (orderInfo.status === "paid") {
-      await appointmentModel.findByIdAndUpdate(orderInfo.receipt, {
-        payment: true,
-      });
-      return json({ success: true, message: "Payment successfully" }, undefined, request);
-    }
-    return json({ success: false, message: "Payment Failed" }, undefined, request);
-  } catch (error) {
-    console.log("Error making payment:", error);
     return json({ success: false, message: (error as Error).message }, undefined, request);
   }
 }

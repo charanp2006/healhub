@@ -19,8 +19,6 @@ export interface OverviewStats {
   revenueGrowth: number;
   videoCount: number;
   inPersonCount: number;
-  onlinePayments: number;
-  cashPayments: number;
 }
 
 export interface TrendPoint {

@@ -616,13 +616,13 @@ export async function hospitalPanelAnalytics(request: Request): Promise<Response
         : 0;
 
     const totalRevenue = appointments
-      .filter((a) => a.isCompleted || a.payment)
+      .filter((a) => a.isCompleted)
       .reduce((sum: number, a) => sum + (a.amount || 0), 0);
     const thisMonthRevenue = appointments
-      .filter((a) => a.date >= thisMonthStart && (a.isCompleted || a.payment))
+      .filter((a) => a.date >= thisMonthStart && a.isCompleted)
       .reduce((sum: number, a) => sum + (a.amount || 0), 0);
     const lastMonthRevenue = appointments
-      .filter((a) => a.date >= lastMonthStart && a.date < lastMonthEnd && (a.isCompleted || a.payment))
+      .filter((a) => a.date >= lastMonthStart && a.date < lastMonthEnd && a.isCompleted)
       .reduce((sum: number, a) => sum + (a.amount || 0), 0);
     const revenueGrowth =
       lastMonthRevenue > 0
@@ -652,7 +652,7 @@ export async function hospitalPanelAnalytics(request: Request): Promise<Response
           speciality: doc?.speciality || "",
           appointments: count,
           revenue: appointments
-            .filter((a) => a.docId?.toString() === dId && (a.isCompleted || a.payment))
+            .filter((a) => a.docId?.toString() === dId && a.isCompleted)
             .reduce((sum: number, a) => sum + (a.amount || 0), 0),
         };
       });
@@ -689,7 +689,7 @@ export async function hospitalPanelAnalytics(request: Request): Promise<Response
         (a) => a.date >= monthStart.getTime() && a.date < monthEnd.getTime()
       );
       const monthRevenue = monthAppts
-        .filter((a) => a.isCompleted || a.payment)
+        .filter((a) => a.isCompleted)
         .reduce((sum: number, a) => sum + (a.amount || 0), 0);
       monthlyTrend.push({
         month: monthLabel,

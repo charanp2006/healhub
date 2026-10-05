@@ -93,55 +93,6 @@ const MyAppointments = () => {
     }
   };
 
-  const initPay = (order) => {
-    const options = {
-      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-      amount: order.amount,
-      currency: order.currency,
-      name: "Appointment Payment",
-      description: "Appointment Payment",
-      order_id: order.id,
-      receipt: order.receipt,
-      handler: async (response) => {
-        try {
-          const { data } = await axios.post(
-            `${backendURL}/api/user/verify-razorpaypay`,
-            response,
-            { headers: { token } }
-          );
-          if (data.success) {
-            getAppointments();
-            router.push("/my-appointments");
-          }
-        } catch (error) {
-          console.log(error.message);
-          toast.error(error.message);
-        }
-      },
-    };
-    const rzp = new window.Razorpay(options);
-    rzp.open();
-  };
-
-  const appointmentRazorpay = async (appointmentId) => {
-    try {
-      const { data } = await axios.post(
-        `${backendURL}/api/user/payment-razorpay`,
-        { appointmentId },
-        { headers: { token } }
-      );
-
-      if (data.success) {
-        initPay(data.order);
-      } else {
-        toast.error(data.message);
-      }
-    } catch (error) {
-      console.log("Error in payment:", error);
-      toast.error(error.message);
-    }
-  };
-
   // Open reschedule modal and load doctor slots
   const openReschedule = (appointment) => {
     setRescheduleId(appointment._id);
@@ -419,19 +370,6 @@ const MyAppointments = () => {
             </div>
             <div></div>
             <div className="flex flex-col gap-2 justify-end text-sm text-center">
-              {!item.cancelled && item.payment && !item.isCompleted && (
-                <button className="text-text-secondary sm:min-w-48 py-2 border rounded bg-primary-soft">
-                  Paid
-                </button>
-              )}
-              {!item.cancelled && !item.payment && !item.isCompleted && (
-                <button
-                  onClick={() => appointmentRazorpay(item._id)}
-                  className="text-text-secondary sm:min-w-48 py-2 border rounded hover:bg-primary hover:text-white transition-all duration-300"
-                >
-                  Pay Online
-                </button>
-              )}
               {!item.cancelled && !item.isCompleted && (
                 <button
                   onClick={() => openReschedule(item)}

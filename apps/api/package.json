@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "seed": "tsx scripts/seed.ts"
+    "seed": "tsx scripts/seed.ts",
+    "migrate:payments": "tsx scripts/migrate-remove-payments.ts"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -17,7 +18,6 @@
     "mongoose": "^8.21.0",
     "next": "16.3.4",
     "next-auth": "^5.0.0-beta.32",
-    "razorpay": "^2.9.6",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "validator": "^13.15.26"

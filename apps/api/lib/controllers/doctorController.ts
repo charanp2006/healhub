@@ -232,7 +232,7 @@ export async function doctorDashboard(request: Request): Promise<Response> {
 
     let earnings = 0;
     appointments.map((appointment) => {
-      if (appointment.isCompleted || !appointment.payment) {
+      if (appointment.isCompleted) {
         earnings += appointment.amount;
       }
     });
@@ -467,22 +467,17 @@ export async function doctorAnalytics(request: Request): Promise<Response> {
         : 0;
 
     const totalRevenue = appointments
-      .filter((a) => a.isCompleted || a.payment)
+      .filter((a) => a.isCompleted)
       .reduce((sum, a) => sum + (a.amount || 0), 0);
 
     const thisMonthRevenue = appointments
-      .filter(
-        (a) =>
-          a.date >= thisMonthStart && (a.isCompleted || a.payment)
-      )
+      .filter((a) => a.date >= thisMonthStart && a.isCompleted)
       .reduce((sum, a) => sum + (a.amount || 0), 0);
 
     const lastMonthRevenue = appointments
       .filter(
         (a) =>
-          a.date >= lastMonthStart &&
-          a.date < lastMonthEnd &&
-          (a.isCompleted || a.payment)
+          a.date >= lastMonthStart && a.date < lastMonthEnd && a.isCompleted
       )
       .reduce((sum, a) => sum + (a.amount || 0), 0);
 
@@ -526,7 +521,7 @@ export async function doctorAnalytics(request: Request): Promise<Response> {
           (a) =>
             a.date >= monthStart.getTime() &&
             a.date < monthEnd.getTime() &&
-            (a.isCompleted || a.payment)
+            a.isCompleted
         )
         .reduce((sum, a) => sum + (a.amount || 0), 0);
 

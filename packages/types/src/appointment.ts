@@ -26,7 +26,6 @@ export interface Appointment {
   prescription?: string;
   followUpDate?: string;
   cancelled?: boolean;
-  payment?: boolean;
   isCompleted?: boolean;
   rescheduled?: boolean;
   rating?: number;

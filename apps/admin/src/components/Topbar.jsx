@@ -11,7 +11,6 @@ import {
   Stethoscope,
   Building2,
   LayoutDashboard,
-  CreditCard,
   Clock,
   Sparkles,
 } from "lucide-react";
@@ -31,7 +30,6 @@ const TITLES = {
   "/blogs-list": "Blog Posts",
   "/analytics": "Analytics",
   "/hospital-analytics": "Hospital Analytics",
-  "/billing": "Billing & Invoices",
 };
 
 const QUICK_LINKS = [
@@ -60,14 +58,6 @@ const DUMMY_NOTIFICATIONS = [
   },
   {
     id: 3,
-    title: "Commission bill ready",
-    desc: "City Hospital's monthly billing is ready to review.",
-    time: "3 hrs ago",
-    Icon: CreditCard,
-    tone: "violet",
-  },
-  {
-    id: 4,
     title: "Revenue milestone",
     desc: "Weekly platform revenue crossed ₹2,00,000.",
     time: "Yesterday",
@@ -79,7 +69,6 @@ const DUMMY_NOTIFICATIONS = [
 const notifTone = {
   blue: "bg-[#3b82f6]/10 text-[#3b82f6]",
   primary: "bg-primary/10 text-primary",
-  violet: "bg-[#8b5cf6]/10 text-[#8b5cf6]",
   emerald: "bg-[#10b981]/10 text-[#10b981]",
 };
 

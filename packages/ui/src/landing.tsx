@@ -12,7 +12,7 @@ export function LandingPage({
   badge = "HEALHUB PORTAL",
   title = "Run your healthcare",
   highlight = "with Healhub.",
-  description = "Sign in to manage your day-to-day operations — appointments, staff, billing and insights — all in one secure place.",
+  description = "Sign in to manage your day-to-day operations — appointments, staff and insights — all in one secure place.",
   primaryLabel = "Open Dashboard",
   primaryHref = "/",
   features = [

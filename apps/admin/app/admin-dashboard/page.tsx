@@ -20,7 +20,7 @@ import {
   FilePlus,
   RefreshCw,
   CalendarRange,
-  CreditCard,
+
   XCircle,
   CheckCircle2,
   Clock,
@@ -438,20 +438,6 @@ const Dashboard = () => {
                 </span>
               </Link>
             ))}
-
-            <Link
-              href="/billing"
-              className="group col-span-2 flex items-center gap-3 rounded-2xl border border-border p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
-            >
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#8b5cf6]/10 text-[#8b5cf6]">
-                <CreditCard size={19} />
-              </span>
-              <span className="flex-1">
-                <span className="block text-sm font-medium text-text-primary">Billing & Invoices</span>
-                <span className="block text-xs text-text-dim">Manage payments and invoices</span>
-              </span>
-              <ArrowRight size={16} className="text-text-dim" />
-            </Link>
           </div>
         </Card>
       </div>

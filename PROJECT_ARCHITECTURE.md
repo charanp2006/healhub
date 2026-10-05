@@ -15,7 +15,6 @@
 | **Database** | MongoDB | - |
 | **ORM** | Mongoose | 8.x |
 | **Auth** | JWT | 9.x |
-| **Payments** | Razorpay | 2.x |
 | **File Storage** | Cloudinary | 2.x |
 
 ### Current Structure (MERN Stack)
@@ -304,7 +303,6 @@ pnpm turbo dev --filter=web
 ### apps/web/.env.local
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:4000
-NEXT_PUBLIC_RAZORPAY_KEY=your_key
 ```
 
 ### apps/api/.env
@@ -376,7 +374,7 @@ CLOUDINARY_URL=your_url
 ### Why Next.js API Routes Win for Healhub
 
 1. **One language** — Frontend already uses TypeScript. No context-switching to Python.
-2. **Shared types** — `User`, `Appointment`, `Billing` types live in `packages/types` and are used by both frontend and backend. FastAPI/Flask can't do this.
+2. **Shared types** — `User`, `Appointment` types live in `packages/types` and are used by both frontend and backend. FastAPI/Flask can't do this.
 3. **No CORS config** — Frontend and API are in the same Next.js app.
 4. **Serverless-ready** — Vercel scales each route automatically.
 5. **Security defaults** — Streaming, edge caching, Auth.js, built-in CSRF/header handling.
@@ -410,7 +408,7 @@ Caching     : Redis (optional)
 | Runtime | Node.js (LTS) | One language end-to-end |
 | Language | TypeScript | Type safety across all apps |
 | Framework | Next.js Routes → Fastify (if separate) | Same stack, fast dev |
-| Database | PostgreSQL | Relational integrity for medical/billing data |
+| Database | PostgreSQL | Relational integrity for medical data |
 | ORM | Prisma | Type-safe, auto-migrations |
 | Validation | Zod | Secure API boundaries |
 | Auth | Auth.js / JWT + refresh | 4-role RBAC support |
@@ -454,7 +452,7 @@ Caching     : Redis (optional)
 | Technology | Purpose |
 |-----------|---------|
 | Node.js (LTS) | Runtime |
-| Next.js API Routes | Primary REST API (auth, CRUD, billing) |
+| Next.js API Routes | Primary REST API (auth, CRUD) |
 | **FastAPI (later)** | AI/ML features — added only when ML ships |
 | Mongoose | ODM for MongoDB |
 | Zod | Validation at API boundaries |
@@ -471,16 +469,13 @@ Caching     : Redis (optional)
 ### Auth
 Auth.js (NextAuth) or Firebase Auth, with role-based access control (RBAC) for 4 roles: admin, doctor, hospital, patient.
 
-### Payments
-- **Razorpay** (India) — primary payment gateway
-
 ### File Storage
 - **Cloudinary** — image storage & optimization
 
 ### Architecture: Hybrid Backend (Next.js + FastAPI later)
 
 ```
-web/admin/hospital → Next.js API routes (auth, CRUD, billing, DB)
+web/admin/hospital → Next.js API routes (auth, CRUD, DB)
                           │
                           │ HTTP call (internal only)
                           ▼
@@ -547,7 +542,7 @@ sequenceDiagram
     W-->>U: Redirect to role dashboard
 ```
 
-### 12.2 Patient Booking Journey (with Payment)
+### 12.2 Patient Booking Journey
 
 ```mermaid
 sequenceDiagram
@@ -555,7 +550,6 @@ sequenceDiagram
     participant W as Next.js App (web)
     participant A as Next.js API Routes
     participant D as MongoDB
-    participant R as Razorpay
     participant C as Cloudinary
 
     P->>W: Browse doctors/hospitals
@@ -572,13 +566,7 @@ sequenceDiagram
 
     P->>W: Confirm booking
     W->>A: POST /api/appointments
-    A->>R: Create Razorpay order
-    R-->>A: order (id, amount)
-    A-->>W: order token
-
-    P->>R: Complete payment (UPI/card/wallet)
-    R-->>A: Webhook: payment success
-    A->>D: Confirm appointment, save receipt
+    A->>D: Create appointment
     A-->>W: appointment confirmed
     W-->>P: Confirmation + email/SMS
 ```
