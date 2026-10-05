@@ -4,7 +4,7 @@ import { useState, useCallback, useContext, useEffect } from 'react';
 import { AdminContext } from '@/src/context/AdminContext';
 import { AppContext } from '@/src/context/AppContext';
 import { assets } from '@/src/assets/assets';
-import { Search, Video, MapPin, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
 import { PageContainer, PageHeader, Card, Badge } from '@/src/components/ui';
 
 const AllAppointments = () => {
@@ -12,7 +12,6 @@ const AllAppointments = () => {
   const {currencySymbol, calculateAge, slotDateFormat} = useContext(AppContext);
 
   const [statusFilter, setStatusFilter] = useState('');
-  const [typeFilter, setTypeFilter] = useState('');
   const [doctorFilter, setDoctorFilter] = useState('');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
@@ -23,7 +22,6 @@ const AllAppointments = () => {
   const fetchAppointments = useCallback(async () => {
     const params = { page, limit: 15 };
     if (statusFilter) params.status = statusFilter;
-    if (typeFilter) params.appointmentType = typeFilter;
     if (doctorFilter) params.docId = doctorFilter;
     if (search.trim()) params.search = search.trim();
     const result = await getAllAppointments(params);
@@ -32,7 +30,7 @@ const AllAppointments = () => {
       setTotal(result.total || 0);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, statusFilter, typeFilter, doctorFilter, search, aToken]);
+  }, [page, statusFilter, doctorFilter, search, aToken]);
 
   useEffect(()=>{
     if(aToken){
@@ -40,7 +38,7 @@ const AllAppointments = () => {
       getAllDoctors();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[aToken, page, statusFilter, typeFilter, doctorFilter])
+  },[aToken, page, statusFilter, doctorFilter])
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -79,11 +77,6 @@ const AllAppointments = () => {
           <option value='completed'>Completed</option>
           <option value='cancelled'>Cancelled</option>
         </select>
-        <select value={typeFilter} onChange={(e) => { setTypeFilter(e.target.value); setPage(1); }} className='px-3 py-2 border border-border rounded-lg text-sm outline-none focus:border-primary cursor-pointer'>
-          <option value=''>All Types</option>
-          <option value='in-person'>In-Person</option>
-          <option value='video'>Video Call</option>
-        </select>
         <select value={doctorFilter} onChange={(e) => { setDoctorFilter(e.target.value); setPage(1); }} className='px-3 py-2 border border-border rounded-lg text-sm outline-none focus:border-primary cursor-pointer max-w-48'>
           <option value=''>All Doctors</option>
           {doctors.map(doc => (
@@ -93,10 +86,9 @@ const AllAppointments = () => {
       </div>
 
       <Card padded={false} className='text-sm overflow-hidden'>
-        <div className='hidden sm:grid grid-cols-[0.5fr_3fr_1fr_1fr_3fr_3fr_1fr_1fr] grid-flow-col py-3 px-6 border-b bg-background-muted font-medium text-text-secondary uppercase text-[11px] tracking-wide'>
+        <div className='hidden sm:grid grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] grid-flow-col py-3 px-6 border-b bg-background-muted font-medium text-text-secondary uppercase text-[11px] tracking-wide'>
           <p>#</p>
           <p>Patient</p>
-          <p>Type</p>
           <p>Age</p>
           <p>Date & Time</p>
           <p>Doctor</p>
@@ -109,7 +101,7 @@ const AllAppointments = () => {
           ) :
           (
           appointments.map((appointment, index) => (
-          <div key={index} className='flex flex-wrap justify-between max-sm:gap-2 sm:grid sm:grid-cols-[0.5fr_3fr_1fr_1fr_3fr_3fr_1fr_1fr] py-3 px-6 border-b items-center hover:bg-background-muted'>
+          <div key={index} className='flex flex-wrap justify-between max-sm:gap-2 sm:grid sm:grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] py-3 px-6 border-b items-center hover:bg-background-muted'>
             <p className='max-sm:hidden text-text-dim'>{(page - 1) * 15 + index + 1}</p>
             <div className='flex items-center gap-2'>
               <img className='w-8 rounded-full' src={appointment.userData.image} alt="" />
@@ -117,12 +109,6 @@ const AllAppointments = () => {
                 <p className='font-medium'>{appointment.userData.name}</p>
                 {appointment.symptoms && <p className='text-xs text-text-dim truncate max-w-30' title={appointment.symptoms}>{appointment.symptoms}</p>}
               </div>
-            </div>
-            <div>
-              {appointment.appointmentType === 'video'
-                ? <span className='text-xs flex items-center gap-1 text-blue-600'><Video size={12} /> Video</span>
-                : <span className='text-xs flex items-center gap-1 text-green-600'><MapPin size={12} /> Visit</span>
-              }
             </div>
             <p className='max-sm:hidden'>{calculateAge(appointment.userData.dob)}</p>
             <div>

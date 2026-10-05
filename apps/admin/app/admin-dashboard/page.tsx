@@ -12,8 +12,6 @@ import {
   DollarSign,
   Stethoscope,
   Activity,
-  Video,
-  MapPin,
   ArrowRight,
   UserPlus,
   PlusCircle,
@@ -310,20 +308,6 @@ const Dashboard = () => {
               ))}
             </div>
 
-            <div className="mt-5 grid grid-cols-2 gap-3">
-              <div className="rounded-xl bg-background-muted p-3">
-                <div className="flex items-center gap-1.5 text-xs text-text-secondary">
-                  <MapPin size={13} className="text-primary" /> In-person
-                </div>
-                <p className="mt-1 text-lg font-bold text-text-primary">{overview?.inPersonCount ?? 0}</p>
-              </div>
-              <div className="rounded-xl bg-background-muted p-3">
-                <div className="flex items-center gap-1.5 text-xs text-text-secondary">
-                  <Video size={13} className="text-primary" /> Video call
-                </div>
-                <p className="mt-1 text-lg font-bold text-text-primary">{overview?.videoCount ?? 0}</p>
-              </div>
-            </div>
           </div>
         </Card>
       </div>

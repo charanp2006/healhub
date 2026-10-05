@@ -3,7 +3,7 @@
 import { useContext, useEffect } from "react";
 import { DoctorContext } from "@/src/context/DoctorContext";
 import { AppContext } from "@/src/context/AppContext";
-import { CalendarCheck, Users, CircleDollarSign, CalendarMinus, TrendingUp, Video, CircleCheck, Clock } from "lucide-react";
+import { CalendarCheck, Users, CircleDollarSign, CalendarMinus, TrendingUp, CircleCheck, Clock } from "lucide-react";
 import { SkeletonDashboard } from "@healhub/ui";
 
 const DoctorDashboard = () => {
@@ -24,9 +24,6 @@ const DoctorDashboard = () => {
     { icon: <CircleDollarSign size={24} className="text-purple-500" />, value: `${currencySymbol}${dashData.earnings || 0}`, label: "Earnings" },
     { icon: <CalendarMinus size={24} className="text-red-500" />, value: dashData.cancelledAppointments || 0, label: "Cancelled" },
   ] : [];
-
-  const typeIcon = (t) => t === "video" ? <Video size={14} className="text-blue-500" /> : <Users size={14} className="text-emerald-500" />;
-
   if (!dashData) {
     return <div className="m-5 w-full max-w-4xl"><SkeletonDashboard /></div>;
   }
@@ -56,10 +53,6 @@ const DoctorDashboard = () => {
               <div className="flex-1">
                 <p className="text-text-primary font-medium">{item.userData?.name}</p>
                 <p className="text-sm text-text-dim">{slotDateFormat(item.slotDate)} {item.slotTime}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                {typeIcon(item.appointmentType)}
-                <span className="text-xs text-text-secondary capitalize">{item.appointmentType || "in-person"}</span>
               </div>
               <div className="hidden sm:flex items-center gap-2 text-xs">
                 {item.isCompleted && <span className="flex items-center gap-1 px-2 py-1 bg-emerald-50 text-emerald-600 rounded-full"><CircleCheck size={12} /> Completed</span>}

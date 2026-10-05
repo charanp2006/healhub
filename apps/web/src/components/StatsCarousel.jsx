@@ -1,11 +1,10 @@
-import { Stethoscope, Calendar, Users, Video, FileText, Award } from "lucide-react";
+import { Stethoscope, Calendar, Users, FileText, Award } from "lucide-react";
 
 const StatsCarousel = () => {
   const services = [
     { icon: Calendar, label: "Book Appointments", description: "Schedule appointments with trusted doctors" },
     { icon: Stethoscope, label: "Find Doctors", description: "Browse verified doctors by speciality" },
     { icon: Users, label: "Hospital & Clinics", description: "Discover top-rated healthcare facilities" },
-    { icon: Video, label: "Online Consultation", description: "Connect with doctors from home" },
     { icon: FileText, label: "Health Blogs", description: "Read health tips from medical experts" },
     { icon: Award, label: "Verified Ratings", description: "See patient reviews and ratings" },
   ];

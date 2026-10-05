@@ -13,7 +13,7 @@
     "dev:admin": "npm run dev -w apps/admin",
     "dev:hospital": "npm run dev -w apps/hospital",
     "seed": "npm run seed -w apps/api",
-    "clean": "turbo run clean && rimraf --glob node_modules/**/.next apps/*/node_modules"
+    "clean": "node scripts/clean.mjs"
   },
   "workspaces": [
     "apps/*",

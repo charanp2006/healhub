@@ -1,12 +1,12 @@
 # Healhub - Hospital Management & Healthcare Booking Platform
 
-## 🔗 Repository Links
+<!-- ## 🔗 Repository Links
 
 [![Frontend](https://img.shields.io/badge/Frontend-Vercel-black?style=for-the-badge&logo=vercel)](https://github.com/charanp2006/healhub-frontend)
 
 [![Backend](https://img.shields.io/badge/Backend-Node.js-green?style=for-the-badge&logo=node.js)](https://github.com/charanp2006/healhub-backend)
 
-[![Admin](https://img.shields.io/badge/Admin-Vercel-black?style=for-the-badge&logo=vercel)](https://github.com/charanp2006/healhub-admin)
+[![Admin](https://img.shields.io/badge/Admin-Vercel-black?style=for-the-badge&logo=vercel)](https://github.com/charanp2006/healhub-admin) -->
 
 
 ## 🏥📱 What is Healhub?
@@ -24,9 +24,9 @@ The platform solves real-world healthcare challenges:
 ### The Patient Journey
 1. **Discovery Phase**: A patient visits Healhub and discovers doctors by speciality (Cardiology, Dermatology, etc.) and hospitals in their area
 2. **Selection Phase**: They view doctor profiles with detailed info (experience, fees, ratings, reviews)
-3. **Booking Phase**: Select a convenient date and time slot, choose between in-person or video appointment
+3. **Booking Phase**: Select a convenient date and time slot at the hospital
 4. **Appointment Phase**: Receive appointment confirmation and reminders
-5. **Consultation Phase**: Attend the appointment (in-person or via video call)
+5. **Consultation Phase**: Attend the appointment in person
 6. **Follow-up Phase**: Receive prescriptions, medical reports, and book follow-up appointments if needed
 
 ### The Doctor Workflow
@@ -142,8 +142,7 @@ flowchart LR
     J --> K{Book Appointment?}
     K -->|No| E
     K -->|Yes| L[Select Date & Time]
-    L --> M[Choose Type: In-person/Video]
-    M --> N[Add Symptoms/Notes]
+    L --> N[Add Symptoms/Notes]
     N --> U[Booking Confirmed]
     U --> V[Receive Confirmation Email]
     V --> W[Attend Appointment]
@@ -264,9 +263,7 @@ flowchart LR
 #### 3. **Smart Appointment Booking**
 - **Select Date**: Pick any date using an interactive calendar
 - **Choose Time Slots**: See doctor's available time slots and their availability
-- **Flexible Appointment Types**:
-  - **In-Person**: Visit the hospital/clinic for face-to-face consultation
-  - **Video Consultation**: Consult from home via secure video call
+- **In-Person Appointments**: Visit the hospital/clinic for a face-to-face consultation
 - **Add Medical Context**:
   - Describe your symptoms
   - Add medical history notes
@@ -274,16 +271,15 @@ flowchart LR
   - Provide additional information for the doctor
 - **Real-Time Availability**: System automatically shows only available slots, no overbooking
 
-**Real-World Example**: Amit has a skin issue. He books Dr. Patel's appointment for Saturday 3 PM (video call), explains his symptoms, and gets confirmation with doctor's contact details.
+**Real-World Example**: Amit has a skin issue. He books Dr. Patel's appointment for Saturday 3 PM, explains his symptoms, and gets confirmation with the hospital's contact details.
 
 #### 4. **Appointment Management Dashboard**
 - **Upcoming Appointments**: See all scheduled appointments in a timeline
 - **Appointment Details**: 
   - Doctor name and speciality
-  - Date, time, and appointment type
+  - Date and time
   - Hospital/clinic location with directions
   - Doctor's contact information
-  - Meeting link (for video appointments)
 - **Cancel or Reschedule**: Change appointment time if needed
 - **Appointment Status**: Track if appointment is:
   - Scheduled
@@ -292,7 +288,7 @@ flowchart LR
   - Cancelled
 - **Appointment History**: View all past consultations
 
-**Real-World Example**: Vikram has an appointment tomorrow. He opens his dashboard, sees all details, gets directions to the hospital, and has the video call link ready before the appointment time.
+**Real-World Example**: Vikram has an appointment tomorrow. He opens his dashboard, sees all details, and gets directions to the hospital before the appointment time.
 
 #### 5. **Prescriptions & Medical Records**
 - **Digital Prescriptions**: Receive doctor's prescription digitally after consultation
@@ -778,7 +774,7 @@ Then approves the registration.
 ### Case Study 1: Chronic Disease Management
 **Scenario**: Rajesh has diabetes and needs regular monitoring
 - **Without Healhub**: Must visit hospital every month, wait 2 hours, pay for consultation
-- **With Healhub**: Video call every month from home, gets prescription instantly, tracks health digitally, saves ₹200 per visit
+- **With Healhub**: Visits monthly, gets prescription instantly, tracks health digitally, saves ₹200 per visit
 
 ### Case Study 2: Hospital Capacity Planning
 **Scenario**: ABC Hospital needs to understand occupancy patterns
@@ -906,7 +902,7 @@ For issues and questions:
 
 - [ ] Mobile app (React Native)
 - [ ] AI-powered doctor recommendation
-- [ ] Telehealth with video recording
+- [ ] Telemedicine
 - [ ] Multi-language support (Hindi, Tamil, Telugu, etc.)
 - [ ] Advanced scheduling and availability management
 - [ ] Patient health records system
@@ -934,7 +930,7 @@ For issues and questions:
 - ✅ Browse and filter doctors by speciality
 - ✅ View hospital profiles and ratings
 - ✅ Book appointments with available time slots
-- ✅ Choose appointment type (in-person or video)
+- ✅ Book an in-person appointment
 - ✅ Manage appointment history
 - ✅ View and download prescriptions
 - ✅ Read health blogs and articles

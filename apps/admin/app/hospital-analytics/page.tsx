@@ -4,7 +4,6 @@ import React, { useContext, useEffect, useState } from 'react';
 import { AdminContext } from '@/src/context/AdminContext';
 import { AppContext } from '@/src/context/AppContext';
 import axios from 'axios';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { TrendingUp, TrendingDown, Building2, Users, CalendarCheck, DollarSign, Star, Award } from 'lucide-react';
 import { SkeletonDashboard } from "@healhub/ui";
 import { PageContainer, PageHeader } from "@/src/components/ui";
@@ -36,8 +35,6 @@ const HospitalAnalytics = () => {
           ...s,
           revenueGrowth: s.revenueGrowth ?? 0,
           totalPatients: s.totalPatients ?? 0,
-          inPersonCount: s.inPersonCount ?? 0,
-          videoCount: s.videoCount ?? 0,
         });
         setTopDoctors((h.topDoctors || []).map((d) => ({
           ...d,
@@ -92,16 +89,6 @@ const HospitalAnalytics = () => {
                 <div className="bg-background-card rounded-xl border border-border p-5 shadow-sm"><div className="flex items-center gap-2 mb-2"><CalendarCheck size={18} className="text-emerald-600" /><span className="text-sm text-text-secondary">Appointments</span></div><p className="text-2xl font-bold text-text-primary">{stats.totalAppointments}</p><GrowthBadge value={stats.appointmentGrowth} /></div>
                 <div className="bg-background-card rounded-xl border border-border p-5 shadow-sm"><div className="flex items-center gap-2 mb-2"><DollarSign size={18} className="text-violet-600" /><span className="text-sm text-text-secondary">Revenue</span></div><p className="text-2xl font-bold text-text-primary">{currencySymbol}{stats.totalRevenue?.toLocaleString()}</p><GrowthBadge value={stats.revenueGrowth} /></div>
                 <div className="bg-background-card rounded-xl border border-border p-5 shadow-sm"><div className="flex items-center gap-2 mb-2"><Users size={18} className="text-blue-600" /><span className="text-sm text-text-secondary">Patients</span></div><p className="text-2xl font-bold text-text-primary">{stats.totalPatients}</p></div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-background-card rounded-xl border border-border p-5 shadow-sm">
-                  <p className="font-semibold text-text-primary mb-4">Appointment Types</p>
-                  <div className="flex items-center justify-center h-48">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart><Pie data={[{ name: 'In-Person', value: stats.inPersonCount || 0 }, { name: 'Video', value: stats.videoCount || 0 }]} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value"><Cell fill="#20C3AE" /><Cell fill="#6366F1" /></Pie><Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid #E5E7EB', fontSize: '12px' }} /><Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }} /></PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
               </div>
             </div>
           )}

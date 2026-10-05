@@ -9,6 +9,7 @@ import {
   checkLoginRateGate,
   recordLoginAttempt,
 } from "../ratelimit";
+import { appTimezone, buildAvailability, resolveSlotDuration } from "../availability";
 
 export async function changeAvailability(request: Request): Promise<Response> {
   try {
@@ -363,6 +364,56 @@ export async function getDoctorScheduleForBooking(
   }
 }
 
+/**
+ * Authoritative availability for booking surfaces.
+ *
+ * Booking, rescheduling and any other client must render exactly what this
+ * returns, so a doctor's dates and times cannot drift between screens.
+ */
+export async function getDoctorAvailabilityForBooking(
+  request: Request,
+  docId: string
+): Promise<Response> {
+  try {
+    await connectDB();
+    const url = new URL(request.url);
+    const days = Number(url.searchParams.get("days") || 7);
+    const from = url.searchParams.get("from") || undefined;
+    // Lets rescheduling keep the appointment's own slot selectable.
+    const ignoreDate = url.searchParams.get("ignoreDate") || undefined;
+    const ignoreTime = url.searchParams.get("ignoreTime") || undefined;
+
+    const doctor = await doctorModel
+      .findById(docId)
+      .select("schedule slotDuration blockedDates slots_booked");
+
+    if (!doctor) {
+      return json({ success: false, message: "Doctor not found" }, undefined, request);
+    }
+
+    const availability = buildAvailability(doctor, {
+      days: Number.isFinite(days) ? days : 7,
+      fromDate: from,
+      ignoreSlot:
+        ignoreDate && ignoreTime ? { date: ignoreDate, time: ignoreTime } : undefined,
+    });
+
+    return json(
+      {
+        success: true,
+        availability,
+        slotDuration: resolveSlotDuration(doctor),
+        timezone: appTimezone(),
+      },
+      undefined,
+      request
+    );
+  } catch (error) {
+    console.log("Error getting doctor availability for booking:", error);
+    return bad((error as Error).message, request);
+  }
+}
+
 export async function addBlockedDates(request: Request): Promise<Response> {
   try {
     await connectDB();
@@ -494,11 +545,6 @@ export async function doctorAnalytics(request: Request): Promise<Response> {
       ...new Set(appointments.map((a) => a.userId?.toString()).filter(Boolean)),
     ];
 
-    const videoCount = appointments.filter(
-      (a) => a.appointmentType === "video"
-    ).length;
-    const inPersonCount = totalAppointments - videoCount;
-
     const monthlyTrend = [];
     for (let i = 5; i >= 0; i--) {
       const monthStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
@@ -572,10 +618,6 @@ export async function doctorAnalytics(request: Request): Promise<Response> {
           totalRevenue,
           thisMonthRevenue,
           revenueGrowth,
-        },
-        breakdown: {
-          videoCount,
-          inPersonCount,
         },
         monthlyTrend,
         weeklyTrend,

@@ -158,7 +158,6 @@ export async function appointmentsAdmin(
     const url = new URL(request.url);
     const status = url.searchParams.get("status");
     const docId = url.searchParams.get("docId");
-    const appointmentType = url.searchParams.get("appointmentType");
     const search = url.searchParams.get("search");
     const page = Number(url.searchParams.get("page") || 1);
     const limit = Number(url.searchParams.get("limit") || 20);
@@ -174,9 +173,6 @@ export async function appointmentsAdmin(
       filter.isCompleted = { $ne: true };
     }
     if (docId) filter.docId = docId;
-    if (appointmentType && ["in-person", "video"].includes(appointmentType)) {
-      filter.appointmentType = appointmentType;
-    }
     if (search) {
       filter["userData.name"] = { $regex: search, $options: "i" };
     }

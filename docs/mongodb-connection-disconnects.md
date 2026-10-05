@@ -1,6 +1,6 @@
 # MongoDB Atlas "automatic disconnect" — root cause & fix
 
-> Applies to: `apps/api` (Next.js 16 Route Handlers, Turbopack on port 4000), Mongoose 8, Atlas `mongodb+srv://` cluster.
+> Applies to: `apps/api` (Next.js 16 Route Handlers, webpack on port 4000), Mongoose 8, Atlas `mongodb+srv://` cluster.
 
 ## TL;DR
 

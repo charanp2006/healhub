@@ -28,6 +28,27 @@ const Appointment = () => {
   const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const router = useRouter();
 
+  // How many days ahead the API should compute availability for.
+  const AVAILABILITY_WINDOW_DAYS = 7;
+  // Render an "HH:mm" slot as 12-hour text for display only. The value sent to
+  // the API always stays in HH:mm.
+  const formatSlotTime = (time) => {
+    const [h, m] = time.split(":").map(Number);
+    const suffix = h >= 12 ? "PM" : "AM";
+    const hour12 = h % 12 === 0 ? 12 : h % 12;
+    return `${hour12}:${String(m).padStart(2, "0")} ${suffix}`;
+  };
+  // Maps the API's lowercase weekday keys onto JS Date#getDay() ordering.
+  const WEEKDAY_INDEX = {
+    sunday: 0,
+    monday: 1,
+    tuesday: 2,
+    wednesday: 3,
+    thursday: 4,
+    friday: 5,
+    saturday: 6,
+  };
+
   // Fetching doctor information based on docId
   const [docInfo, setDocInfo] = useState(null);
 
@@ -36,12 +57,14 @@ const Appointment = () => {
     setDocInfo(docInfo);
   };
 
-  // Fetching available slots for the doctor
+  // Fetching available slots for the doctor.
+  // Days and times come from the API's canonical availability for this doctor,
+  // so booking can never disagree with rescheduling or the doctor's own panel.
   const [docSlots, setDocSlots] = useState([]);
   const [slotIndex, setSlotIndex] = useState(null);
   const [slotTime, setSlotTime] = useState("");
-  const [doctorSchedule, setDoctorSchedule] = useState(null);
-  const [slotDuration, setSlotDuration] = useState(30);
+  const [loadingSlots, setLoadingSlots] = useState(true);
+  const [slotsError, setSlotsError] = useState("");
 
   // Smart appointment fields
   const [symptoms, setSymptoms] = useState("");
@@ -49,132 +72,26 @@ const Appointment = () => {
 
   const getAvailableSlots = async () => {
     setDocSlots([]);
+    setSlotIndex(null);
+    setSlotTime("");
+    setSlotsError("");
+    setLoadingSlots(true);
 
-    // Fetch schedule if not already fetched
-    let schedule = doctorSchedule;
-    let slotDur = slotDuration;
-
-    if (!doctorSchedule) {
-      try {
-        const { data } = await axios.get(
-          `${backendURL}/api/doctor/${docId}/schedule`
-        );
-        if (data.success) {
-          schedule = data.schedule;
-          slotDur = data.slotDuration || 30;
-          setDoctorSchedule(schedule);
-          setSlotDuration(slotDur);
-        }
-      } catch (error) {
-        console.log("Error fetching doctor schedule:", error);
-        // Use default values if fetch fails
-        schedule = docInfo?.schedule || {};
-        slotDur = 30;
+    try {
+      const { data } = await axios.get(
+        `${backendURL}/api/doctor/${docId}/availability`,
+        { params: { days: AVAILABILITY_WINDOW_DAYS } }
+      );
+      if (data.success) {
+        setDocSlots(data.availability || []);
+      } else {
+        setSlotsError(data.message || "Could not load availability");
       }
-    }
-
-    // getting current date
-    const today = new Date();
-    for (let i = 0; i < 7; i++) {
-      // getting date with index
-      const currentDate = new Date(today);
-      currentDate.setDate(currentDate.getDate() + i);
-
-      // Get day name for schedule lookup
-      const dayNames = [
-        "sunday",
-        "monday",
-        "tuesday",
-        "wednesday",
-        "thursday",
-        "friday",
-        "saturday",
-      ];
-      const dayName = dayNames[currentDate.getDay()];
-      const daySchedule = schedule?.[dayName];
-
-      // Check if day is working
-      if (!daySchedule?.enabled) {
-        setDocSlots((prev) => [...prev, []]);
-        continue;
-      }
-
-      // Check if date is blocked
-      const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}-${String(currentDate.getDate()).padStart(2, "0")}`;
-      const isDateBlocked = docInfo?.blockedDates?.includes(dateStr);
-
-      if (isDateBlocked) {
-        setDocSlots((prev) => [...prev, []]);
-        continue;
-      }
-
-      // Get start and end times from schedule
-      const [startHour, startMin] = daySchedule.startTime
-        .split(":")
-        .map(Number);
-      const [endHour, endMin] = daySchedule.endTime.split(":").map(Number);
-
-      // Set start time
-      let currentSlotTime = new Date(currentDate);
-      currentSlotTime.setHours(startHour, startMin, 0, 0);
-
-      // Set end time for comparison
-      const endTime = new Date(currentDate);
-      endTime.setHours(endHour, endMin, 0, 0);
-
-      // For today, don't show past slots
-      if (today.getDate() === currentDate.getDate()) {
-        const now = new Date();
-        if (currentSlotTime <= now) {
-          // Move to next available slot
-          const minsUntilNextSlot =
-            slotDur - (now.getMinutes() % slotDur);
-          currentSlotTime = new Date(
-            now.getTime() + minsUntilNextSlot * 60 * 1000
-          );
-          currentSlotTime.setMinutes(
-            Math.floor(currentSlotTime.getMinutes() / slotDur) * slotDur
-          );
-        }
-      }
-
-      const timeSlots = [];
-
-      while (currentSlotTime < endTime) {
-        const formattedTime = currentSlotTime.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-
-        const day = currentSlotTime.getDate();
-        const month = currentSlotTime.getMonth() + 1;
-        const year = currentSlotTime.getFullYear();
-
-        const slotDate = `${year}-${month < 10 ? "0" + month : month}-${day < 10 ? "0" + day : day}`;
-
-        const isSlotAvailable =
-          docInfo.slots_booked[slotDate] &&
-          docInfo.slots_booked[slotDate].includes(formattedTime)
-            ? false
-            : true;
-
-        if (isSlotAvailable) {
-          timeSlots.push({
-            datetime: new Date(currentSlotTime),
-            time: formattedTime,
-          });
-        }
-
-        // Increment by slot duration
-        currentSlotTime.setMinutes(
-          currentSlotTime.getMinutes() + slotDur
-        );
-      }
-
-      // only add the day if there are available slots
-      if (timeSlots.length > 0) {
-        setDocSlots((prev) => [...prev, timeSlots]);
-      }
+    } catch (error) {
+      console.log("Error fetching doctor availability:", error);
+      setSlotsError("Could not load availability");
+    } finally {
+      setLoadingSlots(false);
     }
   };
 
@@ -190,13 +107,12 @@ const Appointment = () => {
     }
 
     try {
-      const date = docSlots[slotIndex][0].datetime;
-
-      const day = date.getDate();
-      const month = date.getMonth() + 1;
-      const year = date.getFullYear();
-
-      const slotDate = `${year}-${month < 10 ? "0" + month : month}-${day < 10 ? "0" + day : day}`;
+      // The day object already carries the canonical YYYY-MM-DD from the API.
+      const slotDate = docSlots[slotIndex]?.date;
+      if (!slotDate) {
+        toast.info("Please select a date and time slot");
+        return;
+      }
 
       const { data } = await axios.post(
         `${backendURL}/api/user/book-appointment`,
@@ -204,7 +120,6 @@ const Appointment = () => {
           docId,
           slotDate,
           slotTime,
-          appointmentType: "in-person",
           symptoms,
           notes,
         },
@@ -234,7 +149,7 @@ const Appointment = () => {
       getAvailableSlots();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [docInfo, doctorSchedule, docId]);
+  }, [docInfo, docId]);
 
   // reset slot index when slots array changes
   useEffect(() => {
@@ -352,9 +267,9 @@ const Appointment = () => {
                 Pick a date
               </p>
               <div className="flex gap-3 overflow-x-auto pb-2">
-                {docSlots.length &&
+                {docSlots.length > 0 &&
                     docSlots.map((item, index) => {
-                      if (!item || item.length === 0) return null;
+                      if (!item || item.slots.length === 0) return null;
                       const active = slotIndex === index;
                       return (
                         <button
@@ -362,7 +277,7 @@ const Appointment = () => {
                             setSlotTime("");
                             setSlotIndex(active ? null : index);
                           }}
-                          key={index}
+                          key={item.date}
                           className={`min-w-[72px] flex-shrink-0 rounded-2xl border px-4 py-3 text-center transition-all ${
                             active
                               ? "border-primary bg-primary text-white shadow-lg shadow-primary/25"
@@ -374,17 +289,20 @@ const Appointment = () => {
                               active ? "text-white/80" : "text-text-dim"
                             }`}
                           >
-                            {daysOfWeek[item[0].datetime.getDay()]}
+                            {daysOfWeek[WEEKDAY_INDEX[item.weekday]]}
                           </span>
                           <span className="mt-0.5 block text-lg font-bold">
-                            {item[0].datetime.getDate()}
+                            {Number(item.date.slice(-2))}
                           </span>
                         </button>
                       );
                     })}
                 {docSlots.length === 0 && (
                   <p className="flex items-center gap-2 text-sm text-text-dim">
-                    <Clock size={14} /> Loading available slots...
+                    <Clock size={14} />
+                    {loadingSlots
+                      ? "Loading available slots..."
+                      : slotsError || "No available dates in the coming week"}
                   </p>
                 )}
               </div>
@@ -406,14 +324,14 @@ const Appointment = () => {
                 </div>
               ) : docSlots[slotIndex] ? (
                 <div className="flex flex-wrap gap-2.5">
-                  {docSlots[slotIndex].map((item, index) => {
-                    const active = item.time === slotTime;
+                  {docSlots[slotIndex].slots.map((time) => {
+                    const active = time === slotTime;
                     return (
                       <button
                         onClick={() =>
-                          setSlotTime(active ? "" : item.time)
+                          setSlotTime(active ? "" : time)
                         }
-                        key={index}
+                        key={time}
                         className={`inline-flex items-center gap-1.5 rounded-full border px-5 py-2 text-sm font-medium transition-all ${
                           active
                             ? "border-primary bg-primary text-white shadow-md shadow-primary/25"
@@ -421,7 +339,7 @@ const Appointment = () => {
                         }`}
                       >
                         {active && <Check size={14} />}
-                        {item.time.toLowerCase()}
+                        {formatSlotTime(time)}
                       </button>
                     );
                   })}

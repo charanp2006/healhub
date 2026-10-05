@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from "react";
 import { DoctorContext } from "@/src/context/DoctorContext";
 import { AppContext } from "@/src/context/AppContext";
 import { toast } from "react-toastify";
-import { CalendarCheck, CircleCheck, Video, Users, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { CalendarCheck, CircleCheck, ChevronLeft, ChevronRight, X } from "lucide-react";
 
 const DoctorAppointments = () => {
   const { dToken, appointments, getDoctorAppointments, completeDoctorAppointment, cancelDoctorAppointment } = useContext(DoctorContext);
@@ -28,9 +28,6 @@ const DoctorAppointments = () => {
   const totalPages = Math.ceil(appointments?.length / appointmentsPerPage) || 1;
   const startIndex = (currentPage - 1) * appointmentsPerPage;
   const paginatedAppointments = appointments?.slice(startIndex, startIndex + appointmentsPerPage) || [];
-
-  const typeIcon = (t) => t === "video" ? <Video size={12} className="text-blue-500" /> : <Users size={12} className="text-emerald-500" />;
-
   return (
     <div className="w-full max-w-4xl m-5">
       <p className="mb-3 text-lg font-medium text-text-primary">All Appointments</p>
@@ -48,7 +45,7 @@ const DoctorAppointments = () => {
             <p className="hidden sm:block text-text-dim font-medium">{startIndex + index + 1}</p>
             <div className="flex items-center gap-3">
               <img className="w-8 h-8 rounded-full bg-background-muted object-cover" src={item.userData?.image} alt="" />
-              <div><p className="text-text-primary font-medium">{item.userData?.name}</p><div className="flex items-center gap-1">{typeIcon(item.appointmentType)}<span className="text-xs capitalize">{item.appointmentType || "in-person"}</span></div></div>
+              <div><p className="text-text-primary font-medium">{item.userData?.name}</p></div>
             </div>
             <p className="text-sm">{calculateAge(item.userData?.dob) || "N/A"}</p>
             <p className="text-sm">{slotDateFormat(item.slotDate) + ", " + item.slotTime}</p>

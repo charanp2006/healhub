@@ -9,7 +9,8 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "seed": "tsx scripts/seed.ts",
-    "migrate:payments": "tsx scripts/migrate-remove-payments.ts"
+    "migrate:payments": "tsx scripts/migrate-remove-payments.ts",
+    "test:availability": "tsx scripts/test-availability.ts"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
