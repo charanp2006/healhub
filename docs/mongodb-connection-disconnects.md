@@ -1,5 +1,7 @@
 # MongoDB Atlas "automatic disconnect" — root cause & fix
 
+> **Superseded:** see [`connection-hardening.md`](./connection-hardening.md) for the current connection options and read-retry policy. This document is kept for historical context. Its claim that Atlas free clusters pause after ~60 minutes is incorrect: Atlas pauses free clusters only after **30 days** with zero connections.
+
 > Applies to: `apps/api` (Next.js 16 Route Handlers, webpack on port 4000), Mongoose 8, Atlas `mongodb+srv://` cluster.
 
 ## TL;DR
@@ -26,10 +28,8 @@ The recommended fix (Section 4) turns `db.ts` into a **self-healing, monitored, 
 
 ## 2. Root-cause analysis (ranked by likelihood)
 
-### 2.1 Atlas **M0 / M2 free & shared tiers auto-pause after ~60 min idle**
-This is by far the most common cause on free clusters. Atlas pauses *shared* (M0/M2) clusters after ~60 minutes of inactivity and spins them back up on the next connection attempt. Resume takes **15–60 s**, so the *first* request after idle fails `server selection` while the cluster wakes, and the driver's default `serverSelectionTimeoutMS` (30 s) may not be enough.
-
-**Proof:** Atlas console → cluster card shows `Paused`; activity log shows `Cluster paused`.
+### 2.1 Atlas **M0 / M2 free & shared tiers auto-pause after 30 days idle** (corrected)
+Atlas pauses *shared* (M0/M2) clusters after **30 days** with zero connections and spins them back up on the next connection attempt. Resume takes **15–60 s**, so the *first* request after a long dormancy can fail `server selection` while the cluster wakes. This is **not** the cause of disconnects after a few hours; those are idle-socket issues (see 2.3).
 
 ### 2.2 Stale singleton: `db.ts` returns a dead connection forever
 ```ts
