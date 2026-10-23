@@ -8,6 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Releases are tagged as `vX.Y.Z` on git. See `docs/versioning.md` for how to
 maintain this file and release a new version.
 
+## [0.6.0](https://github.com/charanp2006/healhub/compare/HealHub-v0.5.0...HealHub-v0.6.0) (2026-10-23)
+
+
+### Features
+
+* implement read retry mechanism for transient connection errors and enhance MongoDB connection settings ([dbe2707](https://github.com/charanp2006/healhub/commit/dbe2707b865008c0eb5091418fe8ddfc2b38d661))
+* implement read retry mechanism for transient connection errors and enhance MongoDB connection settings ([5469349](https://github.com/charanp2006/healhub/commit/546934963aadaeda4020ac03bbebbdcd7e3a5cf0))
+* serve demo credentials at /demo-cred and remove UI hints ([d1181ee](https://github.com/charanp2006/healhub/commit/d1181eed965dff2a0b23b81a7395c12bba7ee5db))
+
+
+### Bug Fixes
+
+* **api:** ping database in health check and correct Atlas pause guidance ([6729d13](https://github.com/charanp2006/healhub/commit/6729d13bce1c49a5cf6f91c9b64ad0a1fa69f170))
+
 ## [0.5.0](https://github.com/charanp2006/healhub/compare/HealHub-v0.4.0...HealHub-v0.5.0) (2026-10-05)
 
 
