@@ -1,24 +1,33 @@
 export const runtime = "nodejs";
 
+import mongoose from "mongoose";
 import connectDB from "@/lib/db";
-import { handleOptions, json, ok } from "@/lib/http";
+import { handleOptions, ok } from "@/lib/http";
+
+const DB_PING_TIMEOUT_MS = 2000;
+
+// Shallow, best-effort ping. A slow or unavailable database must never make the
+// health check fail: Render uses this endpoint for liveness and keep-alive
+// monitors poll it, so it always returns 200.
+async function pingDatabase(): Promise<boolean> {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => resolve(false), DB_PING_TIMEOUT_MS);
+
+    connectDB()
+      .then(async () => {
+        const db = mongoose.connection.db;
+        if (!db) return resolve(false);
+        await db.admin().command({ ping: 1 });
+        resolve(true);
+      })
+      .catch(() => resolve(false))
+      .finally(() => clearTimeout(timer));
+  });
+}
 
 export async function GET(request: Request) {
-  try {
-    await Promise.race([
-      connectDB(),
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("db connection timed out")), 5000)
-      ),
-    ]);
-    return ok({ status: "ok", db: "connected" }, request);
-  } catch {
-    return json(
-      { success: false, status: "error", db: "disconnected" },
-      503,
-      request
-    );
-  }
+  const connected = await pingDatabase();
+  return ok({ status: "ok", db: connected ? "connected" : "disconnected" }, request);
 }
 
 export { handleOptions as OPTIONS };

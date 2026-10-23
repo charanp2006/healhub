@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "seed": "tsx scripts/seed.ts",
     "migrate:payments": "tsx scripts/migrate-remove-payments.ts",
-    "test:availability": "tsx scripts/test-availability.ts"
+    "test:availability": "tsx scripts/test-availability.ts",
+    "test:read-retry": "tsx scripts/test-read-retry.ts"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

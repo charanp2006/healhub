@@ -12,19 +12,12 @@ const Login = () => {
   const [state, setState] = useState("Sign up");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showDemo, setShowDemo] = useState(false);
 
   const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-
-  const adminPageLink = process.env.NEXT_PUBLIC_ADMIN_PAGE_LINK;
-  const demoAdminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-  const demoAdminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
-  const demoUserEmail = process.env.NEXT_PUBLIC_USER_EMAIL;
-  const demoUserPassword = process.env.NEXT_PUBLIC_USER_PASSWORD;
 
   const { backendURL, token, setToken } = useContext(AppContext);
 
@@ -79,10 +72,6 @@ const Login = () => {
     setState(newState);
     setPassword("");
     setShowPassword(false);
-  };
-
-  const handleDemoToggle = () => {
-    setShowDemo((prev) => !prev);
   };
 
   useEffect(() => {
@@ -170,14 +159,6 @@ const Login = () => {
           )}
         </button>
 
-        <button
-          type="button"
-          onClick={handleDemoToggle}
-          className="w-full rounded-md border border-border bg-background-muted py-2 text-sm font-semibold text-text-primary hover:bg-background-muted transition-colors"
-        >
-          Demo credentials
-        </button>
-
         {state === "Sign up" ? (
           <p>
             Already have an account?{" "}
@@ -200,71 +181,6 @@ const Login = () => {
           </p>
         )}
       </div>
-
-      {showDemo && (
-        <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/40 px-4 py-6">
-          <div className="w-full max-w-md rounded-2xl bg-background-card p-5 shadow-xl">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold text-text-primary">
-                Demo Credentials
-              </p>
-              <button
-                type="button"
-                onClick={handleDemoToggle}
-                className="text-xs font-semibold text-text-secondary hover:text-text-primary"
-              >
-                Close
-              </button>
-            </div>
-            <div className="mt-4 space-y-4 text-xs text-text-primary">
-              <div>
-                <p className="font-medium text-text-primary">User Login</p>
-                <p>
-                  <span className="text-text-secondary">Email:</span>{" "}
-                  <span className="font-mono text-text-primary">
-                    {demoUserEmail}
-                  </span>
-                </p>
-                <p>
-                  <span className="text-text-secondary">Password:</span>{" "}
-                  <span className="font-mono text-text-primary">
-                    {demoUserPassword}
-                  </span>
-                </p>
-              </div>
-              <div>
-                <p className="font-medium text-text-primary">Admin Login</p>
-                <p>
-                  <span className="text-text-secondary">Email:</span>{" "}
-                  <span className="font-mono text-text-primary">
-                    {demoAdminEmail}
-                  </span>
-                </p>
-                <p>
-                  <span className="text-text-secondary">Password:</span>{" "}
-                  <span className="font-mono text-text-primary">
-                    {demoAdminPassword}
-                  </span>
-                </p>
-                {adminPageLink ? (
-                  <a
-                    href={adminPageLink}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-2 inline-flex text-xs font-semibold text-primary hover:text-primary/80"
-                  >
-                    Open Admin Console
-                  </a>
-                ) : (
-                  <p className="mt-2 text-xs text-text-secondary">
-                    Admin console link not configured.
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </form>
   );
 };

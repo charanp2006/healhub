@@ -18,7 +18,8 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+  if (event.request.method !== 'GET' || url.pathname.startsWith('/api/') || url.pathname.startsWith('/demo-cred')) return;
   event.respondWith(
     caches.match(event.request).then((response) => {
       if (response) return response;

@@ -1,4 +1,7 @@
 import mongoose from "mongoose";
+import { installReadRetry } from "./readRetry";
+
+installReadRetry();
 
 declare global {
    
@@ -82,15 +85,20 @@ const resetCache = () => {
 mongoose.set("bufferCommands", false);
 
 const MONGO_OPTIONS: mongoose.ConnectOptions = {
-  serverSelectionTimeoutMS: 8000,
-  connectTimeoutMS: 8000,
-  socketTimeoutMS: 0,
+  serverSelectionTimeoutMS: 5000,
+  connectTimeoutMS: 10000,
+  socketTimeoutMS: 45000,
+  // Drop idle sockets before the network/NAT/Atlas front end silently closes
+  // them. Without this the pool reuses a dead socket after an idle period and
+  // the first request hangs until server selection times out.
+  maxIdleTimeMS: 45000,
+  maxPoolSize: 50,
+  minPoolSize: 0,
   // Atlas DNS records can resolve to IPv6 which some networks drop silently —
   // force IPv4 to avoid intermittent "could not connect to any servers".
   family: 4,
   retryWrites: true,
   retryReads: true,
-  maxPoolSize: 10,
 };
 
 export async function connectDB(): Promise<typeof mongoose> {
