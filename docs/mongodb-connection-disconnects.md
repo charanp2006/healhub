@@ -29,7 +29,7 @@ The recommended fix (Section 4) turns `db.ts` into a **self-healing, monitored, 
 ## 2. Root-cause analysis (ranked by likelihood)
 
 ### 2.1 Atlas **M0 / M2 free & shared tiers auto-pause after 30 days idle** (corrected)
-Atlas pauses *shared* (M0/M2) clusters after **30 days** with zero connections and spins them back up on the next connection attempt. Resume takes **15–60 s**, so the *first* request after a long dormancy can fail `server selection` while the cluster wakes. This is **not** the cause of disconnects after a few hours; those are idle-socket issues (see 2.3).
+Atlas pauses *shared* (M0/M2) clusters after **30 days** with zero connections. A paused cluster must be **resumed manually** in the Atlas UI (or via the Atlas Admin API) before clients can connect; a connection attempt does not wake it. Resume takes **15–60 s**, and retrying alone will not succeed until the cluster is resumed. This is **not** the cause of disconnects after a few hours; those are idle-socket issues (see 2.3).
 
 ### 2.2 Stale singleton: `db.ts` returns a dead connection forever
 ```ts
@@ -56,7 +56,7 @@ On free hosting (Render, Railway, Vercel Hobby) the **process itself is killed a
 | readyState fail pattern | Add the health route from §4, hit `/api/health` after idle | `readyState` says `0`/`2` while app "works" → **2.2** |
 | ECONNRESET bursts | Server logs | Solitary, after idle → **2.3** |
 | Process restarts | Host dashboard (Render/Railway) restart counter | Restart count grows with no code change → **2.4** |
-| Direct mongosh test | `mongosh "mongodb+srv://…" --eval 'db.runCommand({ping:1})'` (cold) | Fails once, succeeds on 2nd call → **2.1** |
+| Direct mongosh test | `mongosh "mongodb+srv://…" --eval 'db.runCommand({ping:1})'` (cold) | Fails until the cluster is resumed in Atlas → **2.1** |
 | Duplicate pools | Atlas → Real-Time / Metrics → connections per app | > 100 with one instance, or count jumps per request → **2.5** |
 
 ---

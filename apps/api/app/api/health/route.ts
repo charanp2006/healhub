@@ -14,7 +14,12 @@ async function pingDatabase(): Promise<boolean> {
     const timer = setTimeout(() => resolve(false), DB_PING_TIMEOUT_MS);
 
     connectDB()
-      .then(() => resolve(mongoose.connection.readyState === 1))
+      .then(async () => {
+        const db = mongoose.connection.db;
+        if (!db) return resolve(false);
+        await db.admin().command({ ping: 1 });
+        resolve(true);
+      })
       .catch(() => resolve(false))
       .finally(() => clearTimeout(timer));
   });
