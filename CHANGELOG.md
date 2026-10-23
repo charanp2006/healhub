@@ -8,6 +8,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Releases are tagged as `vX.Y.Z` on git. See `docs/versioning.md` for how to
 maintain this file and release a new version.
 
+## [0.5.0](https://github.com/charanp2006/healhub/compare/HealHub-v0.4.0...HealHub-v0.5.0) (2026-10-05)
+
+
+### Features
+
+* add apiEndpoints definition for managing API routes ([6a04630](https://github.com/charanp2006/healhub/commit/6a04630fbb2cb1463febdb616ae73589a939b270))
+* create API directory layout and page with authentication ([6a04630](https://github.com/charanp2006/healhub/commit/6a04630fbb2cb1463febdb616ae73589a939b270))
+* enhance admin panel with sidebar collapse functionality, topbar, and new UI components ([fb26c91](https://github.com/charanp2006/healhub/commit/fb26c919b85b0810d3c5f7f38cfb2a3ad05fcdb0))
+* implement API endpoints listing with search and filtering functionality ([6a04630](https://github.com/charanp2006/healhub/commit/6a04630fbb2cb1463febdb616ae73589a939b270))
+* implement rescheduling functionality for appointments with improved availability handling ([7805838](https://github.com/charanp2006/healhub/commit/78058386c6a3d9fae225c354ee8a01258d97a610))
+* implement rescheduling functionality for appointments with improved availability handling ([479f0a9](https://github.com/charanp2006/healhub/commit/479f0a966c48993eb6c7cd7f33f58d90710a73ad))
+* implement ToastProvider for custom toast notifications ([6a04630](https://github.com/charanp2006/healhub/commit/6a04630fbb2cb1463febdb616ae73589a939b270))
+
+
+### Bug Fixes
+
+* **api:** remove unbounded reconnect recursion in connectDB ([419708c](https://github.com/charanp2006/healhub/commit/419708cd196160ab12dcf393e721844064c54c5a))
+* **api:** require request param in handleOptions ([9134b32](https://github.com/charanp2006/healhub/commit/9134b32423383eb13e4aeb8546788f783861e990))
+* update AppContext to handle token retrieval from localStorage safely ([6a04630](https://github.com/charanp2006/healhub/commit/6a04630fbb2cb1463febdb616ae73589a939b270))
+
+
+### Chores
+
+* **apps:** switch Next apps from Turbopack to webpack ([bac5440](https://github.com/charanp2006/healhub/commit/bac54402086b98c54e6d8e30be1809fa974160ee))
+* remove react-toastify dependency from package-lock.json ([6a04630](https://github.com/charanp2006/healhub/commit/6a04630fbb2cb1463febdb616ae73589a939b270))
+* **render:** add Render blueprint for the API service ([5475aa3](https://github.com/charanp2006/healhub/commit/5475aa35a14c1ba41afdcc9aae9bc54088fed36d))
+
+
+### Documentation
+
+* remove Razorpay and billing references ([8ae46c6](https://github.com/charanp2006/healhub/commit/8ae46c67b735a757ce3db9e793aad7dd5d73fd5d))
+
+
+### Refactors
+
+* **api:** remove Razorpay gateway and billing module ([51061c4](https://github.com/charanp2006/healhub/commit/51061c442c452789bb26d10bcbd3f1440f0ff89c))
+* **apps:** remove payment UI and billing pages ([9d0c656](https://github.com/charanp2006/healhub/commit/9d0c65689cc0f2d9ac1157a0830c937a43948ad7))
+* replace react-toastify with custom ToastProvider and update ToastWrapper ([6a04630](https://github.com/charanp2006/healhub/commit/6a04630fbb2cb1463febdb616ae73589a939b270))
+
+
+### Styles
+
+* add global CSS styles for API layout and components ([6a04630](https://github.com/charanp2006/healhub/commit/6a04630fbb2cb1463febdb616ae73589a939b270))
+
 ## [0.4.0](https://github.com/charanp2006/healhub/compare/HealHub-v0.3.0...HealHub-v0.4.0) (2026-09-07)
 
 
