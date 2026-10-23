@@ -86,12 +86,6 @@ const techStack = [
   "Cloudinary media storage",
 ];
 
-const adminLink = process.env.NEXT_PUBLIC_ADMIN_PAGE_LINK;
-const demoAdminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-const demoAdminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
-const demoUserEmail = process.env.NEXT_PUBLIC_USER_EMAIL;
-const demoUserPassword = process.env.NEXT_PUBLIC_USER_PASSWORD;
-
 const DemoContent = () => {
   return (
     <div className="pb-16">
@@ -185,65 +179,6 @@ const DemoContent = () => {
               <li key={item}>{item}</li>
             ))}
           </ul>
-        </div>
-      </section>
-
-      <section className="mt-12">
-        <h2 className="text-2xl font-semibold text-text-primary">Demo Access</h2>
-        <div className="grid gap-6 md:grid-cols-2 mt-6">
-          <div className="border border-border rounded-2xl p-6 bg-background-card shadow-sm">
-            <h3 className="text-lg font-semibold text-text-primary">
-              Patient App Login
-            </h3>
-            <p className="text-sm text-text-secondary mt-2">
-              Use these credentials on the patient web app login page.
-            </p>
-            <div className="mt-4 text-sm text-text-primary space-y-1">
-              <p>
-                <span className="font-medium text-text-primary">Email:</span>{" "}
-                <span className="font-mono">{demoUserEmail}</span>
-              </p>
-              <p>
-                <span className="font-medium text-text-primary">Password:</span>{" "}
-                <span className="font-mono">{demoUserPassword}</span>
-              </p>
-            </div>
-          </div>
-
-          <div className="border border-border rounded-2xl p-6 bg-background-card shadow-sm">
-            <h3 className="text-lg font-semibold text-text-primary">
-              Admin Console Login
-            </h3>
-            <p className="text-sm text-text-secondary mt-2">
-              Open the admin console and sign in with the demo admin account.
-            </p>
-            <div className="mt-4 text-sm text-text-primary space-y-1">
-              <p>
-                <span className="font-medium text-text-primary">Email:</span>{" "}
-                <span className="font-mono">{demoAdminEmail}</span>
-              </p>
-              <p>
-                <span className="font-medium text-text-primary">Password:</span>{" "}
-                <span className="font-mono">{demoAdminPassword}</span>
-              </p>
-            </div>
-            <div className="mt-4">
-              {adminLink ? (
-                <a
-                  href={adminLink}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center rounded-full bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700 transition-colors"
-                >
-                  Open Admin Console
-                </a>
-              ) : (
-                <span className="text-sm text-text-secondary">
-                  Admin console link not configured.
-                </span>
-              )}
-            </div>
-          </div>
         </div>
       </section>
 

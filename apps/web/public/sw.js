@@ -25,6 +25,8 @@ self.addEventListener('install', (event) => {
 
 // Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+  if (event.request.method !== 'GET' || url.pathname.startsWith('/api/') || url.pathname.startsWith('/demo-cred')) return;
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
