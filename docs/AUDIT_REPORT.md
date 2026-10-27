@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-27  
 **Branch:** `dev`  
-**Commit:** `d01839d`  
+**Commit:** `d9c1ae1e64b4d2021a5ca29a02f302ee18678746`  
 **Type:** Monorepo (Turborepo + npm workspaces)
 
 ## 1) Overview
@@ -28,7 +28,7 @@ packages/
 ```
 
 ## 3) Dependencies (high-level)
-- **API:** mongoose ^8.21.0, bcrypt, jsonwebtoken, cloudinary, express-rate-limit (if used), multer, nodemailer, socket.io, zod (where used)
+- **API:** mongoose ^8.21.0, bcrypt, jsonwebtoken, cloudinary, validator, next-auth, zod (where used)
 - **Frontend:** axios, react-hot-toast, framer-motion, lucide-react, next-themes/@healhub/ui theme, socket.io-client
 - **Payments/Billing:** Removed (Razorpay removed in recent commits)
 - **Auth:** JWT-based auth for users/hospitals/doctors; admin auth via env vars (`ADMIN_EMAIL`/`ADMIN_PW`)
@@ -46,7 +46,7 @@ packages/
 - **Floating demo button & navbar demo link:** Removed from web app.
 - **Service workers:** Skip caching `/api/` (and non-GET requests).
 - **MongoDB hardening:** Connection options in `apps/api/lib/db.ts` (pool settings, `bufferCommands: false`, `family: 4`), read-retry logic in `apps/api/lib/readRetry.ts`.
-- **Atlas pause:** Free/shared clusters pause after 30 days idle; must be resumed manually in Atlas UI.
+- **Atlas pause:** Free clusters pause after 30 days idle; must be resumed manually in Atlas UI.
 
 ## 5) Database Models (apps/api/lib/models)
 Key models (inferred): `userModel`, `doctorModel`, `hospitalModel`, `appointmentModel`, etc. Relationships: doctors linked to hospitals via `hospitalId`. Appointments reference users/doctors/hospitals.

@@ -1,7 +1,7 @@
 # Demo Seed Data (Reference Only)
 
 > Do **not** commit real credentials or PHI. This is for local development/testing only. 
-> Run via `apps/api/scripts/seed.ts` or insert manually using the values below.
+> Run `cd apps/api && npm run seed` or insert manually using the values below.
 
 ## 1) Patient / User (users collection)
 ```json
@@ -50,11 +50,10 @@
   "about": "Board-certified cardiologist with a decade of experience in interventional cardiology.",
   "fees": 500,
   "address": { "line1": "12 MG Road", "line2": "Andheri West" },
-  "hospitalId": "<ObjectId of demo hospital>",
-  "date": "<timestamp>",
+  "hospitalId": { "$oid": "<ObjectId of demo hospital>" },
+  "date": 1712345678900,
   "slots_booked": {},
-  "available": true,
-  "verified": true
+  "available": true
 }
 ```
 

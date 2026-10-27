@@ -14,6 +14,7 @@
   *::after { box-sizing: border-box; }
 
   :root {
+    color-scheme: light;
     --primary: #20c3ae;
     --primary-hover: #179e8d;
     --primary-soft: #a6e9e1;
@@ -73,6 +74,7 @@
   }
 
   .dark {
+    color-scheme: dark;
     --s-text-primary: #e8edeb;
     --s-text-secondary: #c1c7c6;
     --s-text-dim: #889397;
@@ -386,7 +388,7 @@
     word-break: break-all;
   }
 
-  .swatch .var { color: var(--s-text-dim); margin-top: 2px; }
+  .swatch .var { color: var(--s-text-secondary); margin-top: 2px; }
 
   .swatch .hex {
     display: inline-block;
@@ -439,7 +441,7 @@
   .btn-outline { background: transparent; border-color: var(--s-border); color: var(--s-text-primary); }
   .btn-outline:hover { background: var(--s-bg-muted); }
   .btn-danger { background: var(--accent-cta); color: #fff; }
-  .btn-warning { background: var(--accent-warning); color: #1f2933; }
+  .btn-warning { background: var(--accent-warning); color: #111827; }
   .btn-ghost { background: transparent; color: var(--s-text-secondary); }
   .btn-ghost:hover { color: var(--s-text-primary); background: var(--s-bg-muted); }
 
@@ -1551,7 +1553,7 @@
       var isDark = root.classList.contains('dark');
       if (toggle) {
         toggle.setAttribute('aria-pressed', String(isDark));
-        toggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+        toggle.setAttribute('aria-label', 'Dark mode');
       }
       if (label) label.textContent = isDark ? 'Dark' : 'Light';
       syncTokenValues();
@@ -1581,14 +1583,38 @@
       el.addEventListener('click', function () {
         var value = el.getAttribute('data-copy') === 'auto' ? el.textContent.trim() : el.getAttribute('data-copy');
         if (!value) return;
-        if (navigator.clipboard && navigator.clipboard.writeText) {
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
           navigator.clipboard.writeText(value).then(function () {
             showToast('Copied ' + value);
           }).catch(function () {
-            showToast('Could not copy');
+            try {
+              var ta = document.createElement('textarea');
+              ta.value = value;
+              ta.style.position = 'fixed';
+              ta.style.opacity = '0';
+              document.body.appendChild(ta);
+              ta.select();
+              document.execCommand('copy');
+              document.body.removeChild(ta);
+              showToast('Copied ' + value);
+            } catch (e) {
+              showToast('Copy manually: ' + value);
+            }
           });
         } else {
-          showToast(value);
+          try {
+            var ta2 = document.createElement('textarea');
+            ta2.value = value;
+            ta2.style.position = 'fixed';
+            ta2.style.opacity = '0';
+            document.body.appendChild(ta2);
+            ta2.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta2);
+            showToast('Copied ' + value);
+          } catch (e) {
+            showToast('Copy manually: ' + value);
+          }
         }
       });
     });
