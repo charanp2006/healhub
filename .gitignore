@@ -41,6 +41,9 @@ yarn-error.log*
 .env*
 !.env.example
 
+# dangerous db cleanup script
+scripts/clean-mongodb-atlas.js
+
 # vercel
 .vercel
 
