@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Releases are tagged as `vX.Y.Z` on git. See `docs/versioning.md` for how to
 maintain this file and release a new version.
 
+## [0.6.1](https://github.com/charanp2006/healhub/compare/HealHub-v0.6.0...HealHub-v0.6.1) (2026-10-27)
+
+
+### Chores
+
+* ignore dangerous mongodb cleanup script ([d01839d](https://github.com/charanp2006/healhub/commit/d01839d9774943db392b135ea411d07ed7889238))
+* remove demo credentials from .env.example files and add demo seed data documentation ([d9c1ae1](https://github.com/charanp2006/healhub/commit/d9c1ae1e64b4d2021a5ca29a02f302ee18678746))
+* remove demo credentials from .env.example files and add documentation ([ff3fad5](https://github.com/charanp2006/healhub/commit/ff3fad54b73b2fcaed3c88eca66398cdcaf6f380))
+* update .env.example and demo seed data documentation; enhance theme preview styles ([d8cccf4](https://github.com/charanp2006/healhub/commit/d8cccf408d1d506209b9beecf27e512d38685c43))
+
 ## [0.6.0](https://github.com/charanp2006/healhub/compare/HealHub-v0.5.0...HealHub-v0.6.0) (2026-10-23)
 
 
