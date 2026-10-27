@@ -5,7 +5,6 @@ import AppContextProvider from "@/src/context/AppContext";
 import { ThemeProvider } from "@healhub/ui/theme";
 import Navbar from "@/src/components/Navbar";
 import Footer from "@/src/components/Footer";
-import FloatingDemoButton from "@/src/components/FloatingDemoButton";
 import MobileAppHeader from "@/src/components/MobileAppHeader";
 import MobileTabBar from "@/src/components/MobileTabBar";
 import ToastWrapper from "@/src/components/ToastWrapper";
@@ -53,7 +52,7 @@ export default function RootLayout({
                 <div className="hidden md:block">
                   <Footer />
                 </div>
-                <FloatingDemoButton />
+                {/* Floating demo button removed */}
                 <MobileTabBar />
               </div>
               <RegisterSW />
